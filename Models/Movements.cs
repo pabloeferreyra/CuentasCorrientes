@@ -11,5 +11,9 @@ public class Movements
     public string? Description { get; set; }
     public int CurrentAccountId { get; set; }
     public CurrentAccounts? CurrentAccount { get; set; }
-    
+    public required string CreatedByUserId { get; set; }
+    public required string ModifiedByUserId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+
 }

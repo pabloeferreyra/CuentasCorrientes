@@ -1,0 +1,151 @@
+﻿@model IEnumerable<ClientType>;
+
+@{
+    ViewData["Title"] = "Tipos de clientes";
+    Layout = "_Layout";
+    var sortOrder = Context.Request.Query["sortOrder"].ToString();
+    Func<string, string> sortLink = col =>
+        Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col });
+}
+
+<!-- Botón para abrir el modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientTypeModal">
+    Nuevo Tipo de Cliente
+</button>
+
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="createClientTypeModal" tabindex="-1" aria-labelledby="createClientTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createClientTypeModalLabel">Nuevo Tipo de Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_Create", new CuentasCorrientes.Models.ClientType())
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bootstrap para editar -->
+<div class="modal fade" id="editClientTypeModal" tabindex="-1" aria-labelledby="editClientTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientTypeModalLabel">Editar Tipo de Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive" id="clientTypeTableContainer">
+    @await Html.PartialAsync("_ClientTypeTable", Model)
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    $(function () {
+        function bindSortLinks() {
+            $('.sort-link').off('click').on('click', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.get(url, function (data) {
+                    $('#clientTypeTableContainer').html(data);
+                    bindSortLinks();
+                });
+            });
+        }
+
+        bindSortLinks();
+
+        $('#createClientTypeForm').submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function () {
+                    $('#createClientTypeModal').modal('hide');
+                    reloadTable();
+                },
+                error: function () {
+                    alert('Error al crear el tipo de cliente.');
+                }
+            });
+        });
+        $('#editClientTypeModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var url = '@Url.Action("Edit", "ClientType")/' + id;
+            var modal = $(this);
+            $.get(url, function (data) {
+                modal.find('.modal-body').html(data);
+
+                // Vuelve a asociar el submit del formulario de edición
+                $('#editClientTypeForm').off('submit').on('submit', function (e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    $.ajax({
+                        type: 'POST',
+                        url: form.attr('action'),
+                        data: form.serialize(),
+                        success: function () {
+                            modal.modal('hide');
+                            reloadTable();
+                        },
+                        error: function () {
+                            alert('Error al editar el tipo de cliente.');
+                        }
+                    });
+                });
+            });
+            });
+        $('#editClientTypeForm').submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function () {
+                    $('#editClientTypeModal').modal('hide');
+                    reloadTable();
+                },
+                error: function () {
+                    alert('Error al editar el tipo de cliente.');
+                }
+            });
+            });
+
+        window.showDeleteConfirmation = function (id) {
+            if (confirm('¿Está seguro que desea eliminar este tipo de cliente?')) {
+                $.ajax({
+                    type: 'POST',
+                    url: $('#deleteForm-' + id).attr('action'),
+                    data: $('#deleteForm-' + id).serialize(),
+                    success: function () {
+                        reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al eliminar el tipo de cliente.');
+                    }
+                });
+            }
+        }
+
+        function reloadTable() {
+            // Llama al Index pero espera solo el partial
+            $.get('@Url.Action("Index", "ClientType", new { sortOrder = sortOrder })', function (data) {
+                $('#clientTypeTableContainer').html(data);
+                bindSortLinks();
+            });
+        }
+    });
+    </script>
+}

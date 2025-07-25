@@ -1,9 +1,8 @@
 using CuentasCorrientes.Data;
-using CuentasCorrientes.Models;
+using CuentasCorrientes.Services;
+using CuentasCorrientes.Services.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
@@ -21,8 +20,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.Password.RequiredUniqueChars = 0;
    }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<LoggerService>();
+builder.Services.AddScoped<IGetClientTypeService, GetClientTypeService>();
+builder.Services.AddScoped<ICreateClientTypeService, CreateClientTypeService>();
+builder.Services.AddScoped<IUpdateClientTypeService, UpdateClientTypeService>();
+builder.Services.AddScoped<IClientTypeRepository, ClientTypeRepository>();
+builder.Services.AddScoped<IDeleteClientTypeService, DeleteClientTypeService>();
+
 
 var app = builder.Build();
 
