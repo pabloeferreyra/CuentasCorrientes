@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CuentasCorrientes.Models;
+﻿namespace CuentasCorrientes.Models;
 
 public class CurrentAccounts
 {

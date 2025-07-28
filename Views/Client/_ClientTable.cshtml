@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Client>
+
+<table class="table" id="clientTable">
+    <thead>
+        <tr>
+            <th>
+                <a href="@Url.Action("Index", new {sortOrder = ViewBag.SortOrder == "Surname" ? "Surname_desc" : "Surname" })" class="link-dark link-underline-opacity-0" data-sort="Surname">
+                    @Html.DisplayNameFor(model => model.Surname)
+                    @(ViewBag.SortOrder?.StartsWith("Surname") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
+                </a>
+            </th>
+            <th>
+                <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Name" ? "Name_desc" : "Name" })" class="link-dark link-underline-opacity-0" data-sort="Name">
+                    @Html.DisplayNameFor(model => model.Name)
+                    @(ViewBag.SortOrder?.StartsWith("Name") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
+                </a>
+            </th>
+            <th>@Html.DisplayNameFor(model => model.Cuit)</th>
+            <th>@Html.DisplayNameFor(model => model.Address)</th>
+            <th>@Html.DisplayNameFor(model => model.CompanyName)</th>
+            <th>@Html.DisplayNameFor(model => model.Email)</th>
+            <th>@Html.DisplayNameFor(model => model.Telephone)</th>
+            <th>
+                <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Type" ? "Type_desc" : "Type" })" class="link-dark link-underline-opacity-0" data-sort="ClientType.Name">
+                    @Html.DisplayNameFor(model => model.ClientType)
+                    @(ViewBag.SortOrder?.StartsWith("Type") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Surname)</td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Cuit)</td>
+                <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                <td>@Html.DisplayFor(modelItem => item.CompanyName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.Telephone)</td>
+                <td>@Html.DisplayFor(modelItem => item.ClientType.Name)</td>
+                <td>
+                    <a class="btn btn-dark" href="#" data-bs-toggle="modal" data-bs-target="#editClientModal" data-id="@item.Id">Editar</a>
+                    <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@item.Id)">Eliminar</button>
+                    <form id="deleteForm-@item.Id" method="post" asp-action="Delete" asp-route-id="@item.Id" style="display:none;">
+                        @Html.AntiForgeryToken()
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

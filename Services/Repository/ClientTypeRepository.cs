@@ -1,8 +1,4 @@
-﻿using CuentasCorrientes.Data;
-using CuentasCorrientes.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace CuentasCorrientes.Services.Repository;
+﻿namespace CuentasCorrientes.Services.Repository;
 
 public interface IClientTypeRepository
 {

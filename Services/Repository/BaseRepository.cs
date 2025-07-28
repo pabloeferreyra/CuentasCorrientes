@@ -1,13 +1,4 @@
-﻿using CuentasCorrientes.Data;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Npgsql;
-using System.Data;
-using System.Linq.Expressions;
-using System.Text;
-
-namespace CuentasCorrientes.Services.Repository;
+﻿namespace CuentasCorrientes.Services.Repository;
 
 public class BaseRepository<T>(ApplicationDbContext context) : IBaseRepository<T> where T : class
 {

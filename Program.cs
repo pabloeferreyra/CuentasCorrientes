@@ -28,9 +28,19 @@ builder.Services.AddSingleton<LoggerService>();
 builder.Services.AddScoped<IGetClientTypeService, GetClientTypeService>();
 builder.Services.AddScoped<ICreateClientTypeService, CreateClientTypeService>();
 builder.Services.AddScoped<IUpdateClientTypeService, UpdateClientTypeService>();
-builder.Services.AddScoped<IClientTypeRepository, ClientTypeRepository>();
 builder.Services.AddScoped<IDeleteClientTypeService, DeleteClientTypeService>();
+builder.Services.AddScoped<IGetClientService, GetClientService>();
+builder.Services.AddScoped<ICreateClientService, CreateClientService>();
+builder.Services.AddScoped<IUpdateClientService, UpdateClientService>();
+builder.Services.AddScoped<IDeleteClientService, DeleteClientService>();
+builder.Services.AddScoped<IGetCurrentAccountService, GetCurrentAccountService>();
+builder.Services.AddScoped<ICreateCurrentAccountService, CreateCurrentAccountService>();
+builder.Services.AddScoped<IUpdateCurrentAccountService, UpdateCurrentAccountService>();
+builder.Services.AddScoped<IDeleteCurrentAccountService, DeleteCurrentAccountService>();
 
+builder.Services.AddScoped<IClientTypeRepository, ClientTypeRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ICurrentAccountRepository, CurrentAccountRepository>();
 
 var app = builder.Build();
 

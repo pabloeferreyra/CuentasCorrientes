@@ -1,8 +1,4 @@
-﻿using CuentasCorrientes.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace CuentasCorrientes.Data;
+﻿namespace CuentasCorrientes.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : IdentityDbContext(options)
 {
