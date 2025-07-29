@@ -1,4 +1,5 @@
-﻿namespace CuentasCorrientes.Controllers;
+﻿
+namespace CuentasCorrientes.Controllers;
 
 public class CurrentAccountController(LoggerService loggerService,
     IGetCurrentAccountService get,
@@ -39,11 +40,6 @@ public class CurrentAccountController(LoggerService loggerService,
             return NotFound();
         }
         return View(currentAccount);
-    }
-    public async Task<ActionResult> Create()
-    {
-        loggerService.Log("CurrentAccount Create action called.");
-        return View();
     }
 
     [HttpPost]
@@ -100,28 +96,20 @@ public class CurrentAccountController(LoggerService loggerService,
         return View(currentAccount);
     }
 
+    // Agrega este método al controlador CurrentAccountController
+
     [HttpPost]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        loggerService.Log($"CurrentAccount Delete action called for ID: {id}");
-        CurrentAccounts currentAccount = await get.GetCurrentAccountById(id);
+        // Lógica para eliminar la cuenta corriente por id
+        var currentAccount = await get.GetCurrentAccountById(id);
         if (currentAccount == null)
         {
-            loggerService.Log($"CurrentAccount with ID {id} not found.");
             return NotFound();
         }
-        try
-        {
-            delete.DeleteCurrentAccount(currentAccount);
-            loggerService.Log($"CurrentAccount deleted successfully for Client ID: {currentAccount.ClientId}");
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex)
-        {
-            loggerService.Log($"Error deleting CurrentAccount: {ex.Message}");
-            ModelState.AddModelError("", "Error deleting CurrentAccount. Please try again.");
-        }
-        return View(currentAccount);
+
+        delete.DeleteCurrentAccount(currentAccount);
+        return Ok();
     }
 
     [HttpGet]

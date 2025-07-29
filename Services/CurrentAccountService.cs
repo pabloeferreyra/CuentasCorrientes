@@ -26,7 +26,7 @@ public interface ICreateCurrentAccountService
 {
     Task CreateCurrentAccount(CurrentAccounts currentAccount);
 }
-public class CreateCurrentAccountService(ICurrentAccountRepository repository) : ICreateCurrentAccountService
+public class CreateCurrentAccountService(ICurrentAccountRepository repository, LoggerService loggerService) : ICreateCurrentAccountService
 {
     public async Task CreateCurrentAccount(CurrentAccounts currentAccount)
     {
@@ -34,7 +34,15 @@ public class CreateCurrentAccountService(ICurrentAccountRepository repository) :
         {
             throw new ArgumentNullException(nameof(currentAccount), "El CurrentAccount no puede ser nulo.");
         }
-        await repository.CreateCurrentAccount(currentAccount);
+        try
+        {
+            await repository.CreateCurrentAccount(currentAccount);
+        }
+        catch(Exception ex)
+        {
+            loggerService.Log($"Error al crear la Cuenta Corriente: {ex.InnerException}");
+            return;
+        }
     }
 }
 #endregion

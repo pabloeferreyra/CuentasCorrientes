@@ -2,9 +2,9 @@
 @{
     ViewData["Title"] = "Clientes";
     Layout = "_Layout";
-    var sortOrder = Context.Request.Query["sortOrder"].ToString();
+    var sortOrder = Context.Request.Query["sortOrder"].ToString() ?? string.Empty;
     Func<string, string> sortLink = col =>
-        Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col });
+        Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
 }
 
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateClientModal">

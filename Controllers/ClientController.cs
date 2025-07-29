@@ -24,8 +24,8 @@ public class ClientController(LoggerService loggerService,
             "Name_desc" => [.. clients.OrderByDescending(c => c.Name)],
             "Surname" => [.. clients.OrderBy(c => c.Surname)],
             "Surname_desc" => [.. clients.OrderByDescending(c => c.Surname)],
-            "Type" => [.. clients.OrderBy(c => c.ClientType.Name)],
-            "Type_desc" => [.. clients.OrderByDescending(c => c.ClientType.Name)],
+            "Type" => [.. clients.OrderBy(c => c.ClientType?.Name)],
+            "Type_desc" => [.. clients.OrderByDescending(c => c.ClientType?.Name)],
             _ => [.. clients.OrderBy(c => c.Name)]
         };
         ViewBag.SortOrder = sortOrder;
@@ -45,11 +45,7 @@ public class ClientController(LoggerService loggerService,
         }
         return View(client);
     }
-    public async Task<ActionResult> Create()
-    {
-        loggerService.Log("Client Create action called.");
-        return View();
-    }
+
     
     [HttpPost]
     public async Task<ActionResult> Create(Client client)

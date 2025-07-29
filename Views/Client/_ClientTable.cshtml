@@ -42,6 +42,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Telephone)</td>
                 <td>@Html.DisplayFor(modelItem => item.ClientType.Name)</td>
                 <td>
+                    <a class="btn btn-primary" href="@Url.Action("Details", "Client", new { id = item.Id })">Detalle</a>
                     <a class="btn btn-dark" href="#" data-bs-toggle="modal" data-bs-target="#editClientModal" data-id="@item.Id">Editar</a>
                     <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@item.Id)">Eliminar</button>
                     <form id="deleteForm-@item.Id" method="post" asp-action="Delete" asp-route-id="@item.Id" style="display:none;">

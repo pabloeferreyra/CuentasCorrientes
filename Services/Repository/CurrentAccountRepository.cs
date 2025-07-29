@@ -20,6 +20,8 @@ public class CurrentAccountRepository(LoggerService loggerService, ApplicationDb
             throw new ArgumentNullException(nameof(currentAccount), "El CurrentAccount no puede ser nulo.");
         }
         loggerService.Log($"Creating CurrentAccount for Client ID: {currentAccount.ClientId}");
+        currentAccount.Date = DateTime.UtcNow.Date;
+        currentAccount.Debt = 0;
         await CreateAsync(currentAccount);
     }
     public void DeleteCurrentAccount(CurrentAccounts currentAccount)

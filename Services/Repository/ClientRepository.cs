@@ -41,7 +41,7 @@ public class ClientRepository(LoggerService loggerService, ApplicationDbContext 
 
     public Task<Client?> GetClient(int id)
     {
-        return FindByCondition(c => c.Id == id).Include(c => c.ClientType).FirstOrDefaultAsync();
+        return FindByCondition(c => c.Id == id).Include(c => c.ClientType).Include(ca => ca.CurrentAccounts).FirstOrDefaultAsync();
     }
 
     public Task<Client?> GetClient(string clientName)
@@ -51,7 +51,7 @@ public class ClientRepository(LoggerService loggerService, ApplicationDbContext 
             loggerService.Log("Attempted to get a Client with a null or empty name.");
             throw new ArgumentException("El nombre del cliente no puede ser nulo o vacío.", nameof(clientName));
         }
-        return FindByCondition(c => c.Name == clientName).Include(c => c.ClientType).FirstOrDefaultAsync();
+        return FindByCondition(c => c.Name == clientName).Include(c => c.ClientType).Include(ca => ca.CurrentAccounts).FirstOrDefaultAsync();
     }
 
     public Task<List<Client>> GetClientsByType(int clientTypeId)

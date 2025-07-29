@@ -4,8 +4,11 @@ public class CurrentAccounts
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    [DisplayName("Saldo")]
     public double Debt { get; set; }
-    public DateTime Date { get; set; } = DateTime.Now;
+    [DisplayName("Fecha Cuenta")]
+    public DateTime Date { get; set; } = DateTime.UtcNow;
+    [DisplayName("Descripcion")]
     public string? Description { get; set; }
     public int ClientId { get; set; }  
     public Client? Client { get; set; }
