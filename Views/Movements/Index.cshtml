@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Movements>
+@{
+    ViewData["Title"] = "Movimientos";
+    Layout = "_Layout";
+    var sortOrder = Context.Request.Query["sortOrder"].ToString();
+    Func<string, string> sortLink = col =>
+    Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var newMovement = new Movements
+    {
+        CurrentAccountId = ViewBag.CurrentAccountId,
+        CreatedByUserId = userId ?? "32156",
+        ModifiedByUserId = userId ?? "1256",
+    };
+}
+<h2>@ViewData["Title"]</h2>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
+    New Movement
+</button>
+
+<div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateMovementModallabel">Nuevo Movimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_Create", newMovement)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive" id="movementsTableContainer">
+    @await Html.PartialAsync("_MovementTable", Model)
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            function bindSortLinks() {
+                $('.sort-link').off('click').on('click', function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    $.get(url, function (data) {
+                        $('#movementsTableContainer').html(data);
+                        bindSortLinks();
+                    });
+                });
+            }
+            bindSortLinks();
+
+            $('.delete-link').off('click').on('click', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                var id = form.find('input[name="id"]').val();
+                showDeleteConfirmation(id, form);
+            });
+            function showDeleteConfirmation(id, form) {
+                if (confirm("Are you sure you want to delete this movement?")) {
+                    form.submit();
+                }
+            }
+
+            $('#CreateMovementModal').on('shown.bs.modal', function () {
+                $(this).find('form')[0]?.reset();
+            });
+            $('#CreateMovementModal').on('submit', 'form', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function (data) {
+                        $('#movementsTableContainer').html(data);
+                        $('#CreateMovementModal').modal('hide');
+                        bindSortLinks();
+                    },
+                    error: function (xhr) {
+                        alert("Error creating movement: " + xhr.responseText);
+                    }
+                });
+            });
+
+            function reloadTable() {
+                $.get('@Url.Action("Index")', function (data) {
+                    $('#movementsTableContainer').html(data);
+                    bindSortLinks();
+                });
+            }
+
+            $('#movementsTableContainer').on('click', '.sort-link', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.get(url, function (data) {
+                    $('#movementsTableContainer').html(data);
+                    bindSortLinks();
+                });
+            });
+        });
+    </script>
+}

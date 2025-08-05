@@ -96,8 +96,6 @@ public class CurrentAccountController(LoggerService loggerService,
         return View(currentAccount);
     }
 
-    // Agrega este método al controlador CurrentAccountController
-
     [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Movements>
+
+<table class="table" id="movementsTable">
+    <thead>
+        <tr>
+            <th>Movement ID</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movement in Model)
+        {
+            <tr>
+                <td>@movement.Id</td>
+                <td>@movement.Amount.ToString("C")</td>
+                <td>@movement.Date.ToShortDateString()</td>
+                <td>@movement.ModifiedByUserId</td>
+                <td>
+                    <a href="@Url.Action("Delete", "Movement", new { id = movement.Id })" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
