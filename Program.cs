@@ -3,20 +3,22 @@ using Microsoft.AspNetCore.Identity;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
 
-// Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-   options.UseNpgsql(builder.Configuration.GetConnectionString("localConnection"))).AddDefaultIdentity<IdentityUser>(options =>
-   {
-       options.SignIn.RequireConfirmedAccount = false;
-       options.Password.RequireDigit = true;
-       options.Password.RequireLowercase = true;
-       options.Password.RequireNonAlphanumeric = false;
-       options.Password.RequireUppercase = false;
-       options.Password.RequiredLength = 6;
-       options.Password.RequiredUniqueChars = 0;
-   }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+   options.UseNpgsql(builder.Configuration.GetConnectionString("localConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false; 
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 0;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
 
@@ -45,9 +47,45 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ICurrentAccountRepository, CurrentAccountRepository>();
 builder.Services.AddScoped<IMovementsRepository, MovementsRepository>();
 
+#region Claims
+foreach (var claim in ClaimsStore.RoleCLaims)
+{
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(claim.Type.Replace(" ", ""), policy =>
+            policy.RequireClaim(claim.Type, claim.Value));
+}
+
+foreach (var claim in ClaimsStore.UserClaims)
+{
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(claim.Type.Replace(" ", ""), policy =>
+            policy.RequireClaim(claim.Type, claim.Value));
+}
+
+foreach (var claim in ClaimsStore.MovementClaims)
+{
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(claim.Type.Replace(" ", ""), policy =>
+            policy.RequireClaim(claim.Type, claim.Value));
+}
+
+foreach (var claim in ClaimsStore.ClientClaims)
+{
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(claim.Type.Replace(" ", ""), policy =>
+            policy.RequireClaim(claim.Type, claim.Value));
+}
+
+foreach (var claim in ClaimsStore.AccountClaims)
+{
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(claim.Type.Replace(" ", ""), policy =>
+            policy.RequireClaim(claim.Type, claim.Value));
+}
+#endregion
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
