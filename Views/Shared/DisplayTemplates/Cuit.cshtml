@@ -1,0 +1,13 @@
+﻿@model string
+
+@{
+    var cuit = Model?.Replace("-", "").Trim();
+    string cuitFormateado = Model;
+
+    if (!string.IsNullOrEmpty(cuit) && cuit.Length == 11)
+    {
+        cuitFormateado = $"{cuit.Substring(0, 2)}-{cuit.Substring(2, 8)}-{cuit.Substring(10, 1)}";
+    }
+}
+
+<span>@cuitFormateado</span>

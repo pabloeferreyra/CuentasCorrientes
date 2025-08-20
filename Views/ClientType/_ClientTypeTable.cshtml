@@ -1,0 +1,37 @@
+﻿@model IEnumerable<ClientType>
+
+<table class="table" id="clientTypeTable">
+    <thead>
+        <tr>
+            <th>
+                <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Name" ? "Name_desc" : "Name" })" class="link-dark link-underline-opacity-0" data-sort="Name">
+                    @Html.DisplayNameFor(model => model.Name)
+                    @(ViewBag.SortOrder?.StartsWith("Name") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
+                </a>
+            </th>
+            <th>
+                <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Description" ? "Description_desc" : "Description" })" class="link-dark link-underline-opacity-0" data-sort="Description">
+                    @Html.DisplayNameFor(model => model.Description)
+                    @(ViewBag.SortOrder?.StartsWith("Description") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="clientTypeTableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>
+                    <a class="btn btn-dark" href="#" data-bs-toggle="modal" data-bs-target="#editClientTypeModal" data-id="@item.Id">Editar</a>
+                    <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@item.Id)">Eliminar</button>
+                    <form id="deleteForm-@item.Id" method="post" asp-action="Delete" asp-route-id="@item.Id" style="display:none;">
+                        @Html.AntiForgeryToken()
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
