@@ -13,5 +13,6 @@ public class Movements
     public required string ModifiedByUserId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
+    public bool Debt { get; set; }
 
 }

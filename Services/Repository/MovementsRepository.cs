@@ -7,7 +7,7 @@ public interface IMovementsRepository
     Task<List<Movements>> GetMovementsByCurrentAccountId(int currentAccountId);
     Task CreateMovement(Movements movement);
     Task UpdateMovement(Movements movement);
-    void DeleteMovement(Movements movement);
+    Task DeleteMovement(Movements movement);
 
 }
 
@@ -34,7 +34,7 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             loggerService.Log("Attempted to create a null Movement.");
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
-        loggerService.Log($"Creating Movement for Current Account ID: {movement.CurrentAccountId}");
+        loggerService.Log($"Creating Movement for Account ID: {movement.CurrentAccountId}");
         movement.Date = DateTime.UtcNow.Date;
         await context.Movements.AddAsync(movement);
         await context.CurrentAccounts.FirstAsync(ca => ca.Id == movement.CurrentAccountId)
@@ -42,7 +42,14 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             {
                 if (ca.Result != null)
                 {
-                    ca.Result.Debt += movement.Amount;
+                    if(movement.Debt == false)
+                    {
+                        ca.Result.Debt += movement.Amount;
+                    }
+                    else
+                    {
+                        ca.Result.Debt -= movement.Amount;
+                    }
                     context.CurrentAccounts.Update(ca.Result);
                 }
             });
@@ -55,18 +62,27 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             loggerService.Log("Attempted to update a null Movement.");
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
-        loggerService.Log($"Updating Movement for Current Account ID: {movement.CurrentAccountId}");
+        loggerService.Log($"Updating Movement for Account ID: {movement.CurrentAccountId}");
         context.Movements.Update(movement);
         await context.SaveChangesAsync();
     }
-    public void DeleteMovement(Movements movement)
+    public async Task DeleteMovement(Movements movement)
     {
         if (movement == null)
         {
             loggerService.Log("Attempted to delete a null Movement.");
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
-        loggerService.Log($"Deleting Movement for Current Account ID: {movement.CurrentAccountId}");
+        loggerService.Log($"Deleting Movement for Account ID: {movement.CurrentAccountId}");
+        await context.CurrentAccounts.FirstAsync(ca => ca.Id == movement.CurrentAccountId)
+            .ContinueWith(ca =>
+            {
+                if (ca.Result != null)
+                {
+                    ca.Result.Debt += movement.Amount;
+                    context.CurrentAccounts.Update(ca.Result);
+                }
+            });
         context.Movements.Remove(movement);
         context.SaveChanges();
     }

@@ -7,7 +7,7 @@ public class CurrentAccounts
     [DisplayName("Saldo")]
     public double Debt { get; set; }
     [DisplayName("Fecha Cuenta")]
-    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public DateTime Date { get; set; }
     [DisplayName("Descripcion")]
     public string? Description { get; set; }
     public int ClientId { get; set; }  

@@ -1,4 +1,6 @@
-﻿namespace CuentasCorrientes.Services;
+﻿using CuentasCorrientes.Helpers;
+
+namespace CuentasCorrientes.Services;
 
 #region GetMovementService
 public interface  IGetMovementService
@@ -24,7 +26,7 @@ public interface ICreateMovementService
     Task CreateMovement(Movements movement);
 }
 
-public class CreateMovementService(IMovementsRepository repository, LoggerService loggerService) : ICreateMovementService
+public class CreateMovementService(IMovementsRepository repository, ICurrentAccountRepository account, LoggerService loggerService) : ICreateMovementService
 {
     public async Task CreateMovement(Movements movement)
     {
@@ -74,12 +76,12 @@ public class UpdateMovementService(IMovementsRepository repository) : IUpdateMov
 #region DeleteMovementService
 public interface IDeleteMovementService
 {
-    void DeleteMovement(Movements movement);
+    Task DeleteMovement(Movements movement);
 }
 
-public class DeleteMovementService(IMovementsRepository repository) : IDeleteMovementService
+public class DeleteMovementService(IMovementsRepository repository, ICurrentAccountRepository account) : IDeleteMovementService
 {
-    public void DeleteMovement(Movements movement)
+    public async Task DeleteMovement(Movements movement)
     {
         if (movement == null)
         {
@@ -87,7 +89,7 @@ public class DeleteMovementService(IMovementsRepository repository) : IDeleteMov
         }
         try
         {
-            repository.DeleteMovement(movement);
+            await repository.DeleteMovement(movement);
         }
         catch (Exception ex)
         {

@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-
-namespace CuentasCorrientes.Controllers;
+﻿namespace CuentasCorrientes.Controllers;
 
 [Authorize(Roles = "SuperUser")]
 public class AdminController(LoggerService logger, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager) : Controller
@@ -79,7 +74,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpGet]
-    [Authorize(Policy = "ViewUser")]
     public IActionResult ListUsers()
     {
         var users = userManager.Users;
@@ -87,7 +81,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpGet]
-    [Authorize(Policy = "EditUser")]
     public async Task<IActionResult> EditUser(string id)
     {
         var user = await userManager.FindByIdAsync(id);
@@ -113,7 +106,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpPost]
-    [Authorize(Policy = "EditUser")]
     public async Task<IActionResult> EditUser(EditUser model)
     {
         var user = await userManager.FindByIdAsync(model.Id);
@@ -152,7 +144,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpPost]
-    [Authorize(Policy = "DeleteUser")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         var user = await userManager.FindByIdAsync(id);
@@ -190,7 +181,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
     
     [HttpPost]
-    [Authorize(Policy = "DeleteRole")]
     public async Task<IActionResult> DeleteRole(string id)
     {
         var role = await roleManager.FindByIdAsync(id);
@@ -232,7 +222,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpGet]
-    [Authorize(Policy = "ViewRole")]
     public IActionResult ListRoles()
     {
         var userRoles = roleManager.Roles;
@@ -240,14 +229,12 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpGet]
-    [Authorize(Policy = "CreateRole")]
     public IActionResult CreateRole()
     {
         return View(new IdentityRole());
     }
 
     [HttpGet]
-    [Authorize(Policy = "EditRole")]
     public async Task<IActionResult> EditRole(string id)
     {
         var role = await roleManager.FindByIdAsync(id);
@@ -276,7 +263,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpPost]
-    [Authorize(Policy = "EditRole")]
     public async Task<IActionResult> EditRole(EditRole model)
     {
         var role = await roleManager.FindByIdAsync(model.Id);
@@ -314,7 +300,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpPost]
-    [Authorize(Policy = "CreateRole")]
     public async Task<IActionResult> CreateRole(IdentityRole role)
     {
         await roleManager.CreateAsync(role);
@@ -322,7 +307,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpGet]
-    [Authorize(Policy = "EditRole")]
     public async Task<IActionResult> EditUsersInRole(string roleId)
     {
         ViewBag.roleId = roleId;
@@ -359,7 +343,6 @@ public class AdminController(LoggerService logger, RoleManager<IdentityRole> rol
     }
 
     [HttpPost]
-    [Authorize(Policy = "EditRole")]
     public async Task<IActionResult> EditUsersInRole(List<UserRole> model, string roleId)
     {
         var role = await roleManager.FindByIdAsync(roleId);

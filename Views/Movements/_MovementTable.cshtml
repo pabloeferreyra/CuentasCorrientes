@@ -3,11 +3,13 @@
 <table class="table" id="movementsTable">
     <thead>
         <tr>
-            <th>Movement ID</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>User</th>
-            <th>Actions</th>
+            <th>Id</th>
+            <th></th>
+            <th>Monto</th>
+            <th>Fecha</th>
+            <th>Descripcion</th>
+            <th>Usuario</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -15,11 +17,25 @@
         {
             <tr>
                 <td>@movement.Id</td>
+                @{
+                    if(movement.Debt)
+                    {
+                        <td>I</td>
+                    }
+                    else
+                    {
+                        <td>E</td>
+                    }
+                }
                 <td>@movement.Amount.ToString("C")</td>
                 <td>@movement.Date.ToShortDateString()</td>
-                <td>@movement.ModifiedByUserId</td>
+                <td>@movement.Description</td>
+                <td>@movement.CreatedByUserId</td>
                 <td>
-                    <a href="@Url.Action("Delete", "Movement", new { id = movement.Id })" class="btn btn-danger">Delete</a>
+                <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
+                <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
+                    @Html.AntiForgeryToken()
+                </form>
                 </td>
             </tr>
         }

@@ -113,6 +113,7 @@
                 });
                 }
             };
+            
             function reloadTable() {
                 $.get('@Url.Action("Index", "Client")', function (data) {
                     $('#clientTableContainer').html(data);
@@ -127,6 +128,80 @@
                     $('#clientTableContainer').html(data);
                     bindSortLinks();
                 });
+            });
+        });
+
+        $(function() {
+            $('#Cuit').on('focusout', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if(value.length === 11) {
+                    var formatted = value.substr(0, 2) + '-' + value.substr(2, 8) + '-' + value.substr(10, 1);
+                    $(this).val(formatted);
+                    $('#cuitFormatted').text('');
+                } else {
+                    $('#cuitFormatted').text('CUIT inválido');
+                }
+            });
+        });
+
+        $(function() {
+            $('#Email').on('focusout', function() {
+                var email = $(this).val().trim();
+                var emailSpan = $('#emailFormatted');
+                var emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+
+                if(!emailRegex.test(email)) {
+                    emailSpan.text('Correo inválido');
+                }
+                else{
+                    emailSpan.text('');
+                }
+            });
+        });
+
+        $(function() {
+            $('#Name').on('focusout', function() {
+                var name = $(this).val().trim();
+                var nameSpan = $('#nameFormatted');
+
+                if(name.length === 0) {
+                    nameSpan.text('El nombre es obligatorio');
+                } else {
+                    var formatted = name.split(' ').map(function(word) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }).join(' ');
+                    $(this).val(formatted);
+                    nameSpan.text('');
+                }
+            });
+        });
+        $(function() {
+            $('#Surname').on('focusout', function() {
+                var name = $(this).val().trim();
+                var nameSpan = $('#surnameFormatted');
+
+                if(name.length === 0) {
+                    nameSpan.text('El apellido es obligatorio');
+                } else {
+                    var formatted = name.split(' ').map(function(word) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }).join(' ');
+                    $(this).val(formatted);
+                    nameSpan.text('');
+                }
+            });
+        });
+
+        $(function() {
+            $('#CompanyName').on('focusout', function() {
+                var name = $(this).val().trim();
+                if(name.length === 0) {
+                } else {
+                    var formatted = name.split(' ').map(function(word) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }).join(' ');
+                    $(this).val(formatted);
+                }
             });
         });
     </script>

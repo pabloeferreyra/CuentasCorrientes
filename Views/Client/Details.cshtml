@@ -82,7 +82,7 @@ else
     <p>No hay cuentas corrientes asociadas a este cliente.</p>
 }
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a type="button" class="btn btn-primary" asp-action="Index">Volver</a>
 </div>
 
 <div class="modal fade" id="editCurrentAccountModal" tabindex="-1" aria-labelledby="editCurrentAccountModalLabel" aria-hidden="true">
@@ -145,9 +145,6 @@ else
                     success: function () {
                         $('#CreateCurrentAccountModal').modal('hide');
                         reloadTable();
-                    },
-                    error: function () {
-                        alert('Error al crear la cuenta corriente.');
                     }
                 });
             });
@@ -198,11 +195,8 @@ else
 
             // Recargar tabla
             function reloadTable() {
-                var url = '@Url.Action("Index")';
-                $.get(url, function (data) {
-                    $('#currentAccountTableContainer').html(data);
-                    bindSortLinks();
-                });
+                var clientId = '@Model.Id';
+                window.location.href = '@Url.Action("Details", "Client")' + '?id=' + clientId;
             }
 
             // Ordenar tabla

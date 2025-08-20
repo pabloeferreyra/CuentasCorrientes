@@ -8,6 +8,7 @@ public class Client
     public string? Surname { get; set; }
     [DisplayName("Nombre")]
     public string? Name { get; set; }
+    [UIHint("Cuit")]
     public string? Cuit { get; set; }
     [DisplayName("Direccion")]
     public string? Address { get; set; }

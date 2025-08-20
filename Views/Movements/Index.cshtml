@@ -53,17 +53,38 @@
             }
             bindSortLinks();
 
-            $('.delete-link').off('click').on('click', function (e) {
+            $('#movementsTableContainer').on('click', '.delete-link', function (e) {
                 e.preventDefault();
-                var form = $(this).closest('form');
-                var id = form.find('input[name="id"]').val();
-                showDeleteConfirmation(id, form);
-            });
-            function showDeleteConfirmation(id, form) {
-                if (confirm("Are you sure you want to delete this movement?")) {
-                    form.submit();
+                if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        success: function () {
+                            reloadTable();
+                        },
+                        error: function () {
+                            alert('Error al eliminar el movimiento.');
+                        }
+                    });
                 }
-            }
+            });
+
+            window.showDeleteConfirmation = function (id) {
+                if (confirm('¿Estás seguro de que deseas eliminar este movimiento?')) {
+                    $.ajax({
+                    type: 'POST',
+                    url: $('#deleteForm-' + id).attr('action'),
+                    data: $('#deleteForm-' + id).serialize(),
+                    success: function () {
+                        reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al eliminar el movimiento.');
+                    }
+                });
+                }
+            };
 
             $('#CreateMovementModal').on('shown.bs.modal', function () {
                 $(this).find('form')[0]?.reset();
@@ -75,10 +96,9 @@
                     type: 'POST',
                     url: form.attr('action'),
                     data: form.serialize(),
-                    success: function (data) {
-                        $('#movementsTableContainer').html(data);
+                    success: function () {
                         $('#CreateMovementModal').modal('hide');
-                        bindSortLinks();
+                        reloadTable();
                     },
                     error: function (xhr) {
                         alert("Error creating movement: " + xhr.responseText);

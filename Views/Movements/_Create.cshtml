@@ -7,8 +7,15 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
         <input type="hidden" asp-for="CurrentAccountId" />
-        <input type="hidden" asp-for="ModifiedByUserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? 1" />
-        <input type="hidden" asp-for="CreatedByUserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? 1" />
+        <input type="hidden" asp-for="ModifiedByUserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" />
+        <input type="hidden" asp-for="CreatedByUserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Debt" class="control-label"></label>
+        <select asp-for="Debt" class="form-control">
+            <option value="true">Ingreso</option>
+            <option value="false">Egreso</option>
+        </select>
     </div>
     <div class="form-group">
         <label asp-for="Amount" class="control-label"></label>

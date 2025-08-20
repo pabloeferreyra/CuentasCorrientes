@@ -16,3 +16,6 @@ global using Npgsql;
 global using System.Data;
 global using System.Linq.Expressions;
 global using System.Text;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Identity;
+global using System.Security.Claims;

@@ -12,7 +12,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Debt.ToString()</td>
+                <td>@item.Debt.ToString("C")</td>
                 <td>@item.Date.ToShortDateString()</td>
                 <td>
                     <div class="d-flex gap-2">

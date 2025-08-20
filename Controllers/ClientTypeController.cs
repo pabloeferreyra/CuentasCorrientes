@@ -1,5 +1,6 @@
 ﻿namespace CuentasCorrientes.Controllers;
 
+[Authorize(Roles = "Admin, SuperUser")]
 public class ClientTypeController(LoggerService loggerService,
     IGetClientTypeService get,
     ICreateClientTypeService create,

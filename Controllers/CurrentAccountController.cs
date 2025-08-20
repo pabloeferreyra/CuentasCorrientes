@@ -1,6 +1,6 @@
-﻿
-namespace CuentasCorrientes.Controllers;
+﻿namespace CuentasCorrientes.Controllers;
 
+[Authorize(Roles = "Admin,User, SuperUser")]
 public class CurrentAccountController(LoggerService loggerService,
     IGetCurrentAccountService get,
     ICreateCurrentAccountService create,
@@ -8,6 +8,7 @@ public class CurrentAccountController(LoggerService loggerService,
     IDeleteCurrentAccountService delete,
     IGetClientService getClient) : Controller
 {
+
     public async Task<ActionResult> Index(string sortOrder)
     {
         loggerService.Log("CurrentAccount Index action called.");
@@ -30,6 +31,7 @@ public class CurrentAccountController(LoggerService loggerService,
             return PartialView("_CurrentAccountTable", currentAccounts);
         return View(currentAccounts);
     }
+
     public async Task<ActionResult> Details(int id)
     {
         loggerService.Log($"CurrentAccount Details action called for ID: {id}");
@@ -52,7 +54,7 @@ public class CurrentAccountController(LoggerService loggerService,
             {
                 await create.CreateCurrentAccount(currentAccount);
                 loggerService.Log($"CurrentAccount created successfully for Client ID: {currentAccount.ClientId}");
-                return RedirectToAction(nameof(Index));
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -63,6 +65,7 @@ public class CurrentAccountController(LoggerService loggerService,
         return View(currentAccount);
     }
 
+    [HttpGet]
     public async Task<ActionResult> Edit(int id)
     {
         loggerService.Log($"CurrentAccount Edit action called for ID: {id}");
@@ -85,7 +88,7 @@ public class CurrentAccountController(LoggerService loggerService,
             {
                 await update.UpdateCurrentAccount(currentAccount);
                 loggerService.Log($"CurrentAccount updated successfully for Client ID: {currentAccount.ClientId}");
-                return RedirectToAction(nameof(Index));
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -120,7 +123,7 @@ public class CurrentAccountController(LoggerService loggerService,
             loggerService.Log($"No CurrentAccount found for Client ID {clientId}.");
             return NotFound();
         }
-        return View(currentAccount);
+        return PartialView("~/Views/Shared/CurrentAccount/_CurrentAccountTable.cshtml", currentAccount);
     }
 
     [HttpGet]
@@ -135,6 +138,4 @@ public class CurrentAccountController(LoggerService loggerService,
         }
         return View(currentAccounts);
     }
-
-    
 }

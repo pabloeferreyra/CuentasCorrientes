@@ -1,5 +1,6 @@
 ﻿namespace CuentasCorrientes.Controllers;
 
+[Authorize(Roles = "Usuario, SuperUser")]
 public class MovementsController(LoggerService loggerService,
     IGetMovementService get,
     ICreateMovementService create,
@@ -8,7 +9,7 @@ public class MovementsController(LoggerService loggerService,
 {
     public async Task<ActionResult> Index(int id, string sortOrder)
     {
-        loggerService.Log($"Movements Index action called for Current Account ID: {id}");
+        loggerService.Log($"Movements Index action called for Account ID: {id}");
         List<Movements> movements = await get.GetMovementsByCurrentAccountId(id);
         movements = sortOrder switch
         {
@@ -22,6 +23,7 @@ public class MovementsController(LoggerService loggerService,
         ViewBag.CurrentAccountId = id;
         return View(movements);
     }
+    
     public async Task<ActionResult> Details(int id)
     {
         loggerService.Log($"Movements Details action called for ID: {id}");
@@ -43,7 +45,7 @@ public class MovementsController(LoggerService loggerService,
             try
             {
                 await create.CreateMovement(movement);
-                loggerService.Log($"Movement created successfully for Current Account ID: {movement.CurrentAccountId}");
+                loggerService.Log($"Movement created successfully for Account ID: {movement.CurrentAccountId}");
                 return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
             }
             catch (Exception ex)
@@ -64,7 +66,7 @@ public class MovementsController(LoggerService loggerService,
             try
             {
                 await update.UpdateMovement(movement);
-                loggerService.Log($"Movement updated successfully for Current Account ID: {movement.CurrentAccountId}");
+                loggerService.Log($"Movement updated successfully for Account ID: {movement.CurrentAccountId}");
                 return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
             }
             catch (Exception ex)
@@ -89,7 +91,7 @@ public class MovementsController(LoggerService loggerService,
         try
         {
             delete.DeleteMovement(movement);
-            loggerService.Log($"Movement deleted successfully for Current Account ID: {movement.CurrentAccountId}");
+            loggerService.Log($"Movement deleted successfully for Account ID: {movement.CurrentAccountId}");
             return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
         }
         catch (Exception ex)
