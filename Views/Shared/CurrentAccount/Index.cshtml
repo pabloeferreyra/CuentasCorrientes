@@ -7,9 +7,12 @@
         Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
 }
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateCurrentAccountModal">
-    Nueva Cuenta Corriente
-</button>
+@if (User.IsInRole("SuperUser"))
+{
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateCurrentAccountModal">
+        Nueva Cuenta Corriente
+    </button>
+}
 
 <!-- Modal para crear cuenta corriente -->
 <div class="modal fade" id="CreateCurrentAccountModal" tabindex="-1" aria-labelledby="CreateCurrentAccountModalLabel" aria-hidden="true">

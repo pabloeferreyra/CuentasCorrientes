@@ -5,18 +5,18 @@
     var sortOrder = Context.Request.Query["sortOrder"].ToString();
     Func<string, string> sortLink = col =>
     Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
-    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var userId = @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
     var newMovement = new Movements
     {
         CurrentAccountId = ViewBag.CurrentAccountId,
-        CreatedByUserId = userId ?? "32156",
-        ModifiedByUserId = userId ?? "1256",
+        CreatedByUserId = userId,
+        ModifiedByUserId = userId,
     };
 }
 <h2>@ViewData["Title"]</h2>
 
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
-    New Movement
+    Agregar
 </button>
 
 <div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">

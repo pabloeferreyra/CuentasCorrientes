@@ -1,6 +1,6 @@
 ﻿namespace CuentasCorrientes.Controllers;
 
-[Authorize(Roles = "Usuario, SuperUser")]
+[Authorize(Roles = "Usuario, Administrador")]
 public class MovementsController(LoggerService loggerService,
     IGetMovementService get,
     ICreateMovementService create,
@@ -57,6 +57,7 @@ public class MovementsController(LoggerService loggerService,
         return RedirectToAction(nameof(Index), new {currentAccountId = movement.CurrentAccountId});
     }
 
+    [Authorize(Roles = "Administrador")]
     [HttpPost]
     public async Task<ActionResult> Edit(Movements movement)
     {
@@ -77,7 +78,8 @@ public class MovementsController(LoggerService loggerService,
         }
         return View(movement);
     }
-    
+
+    [Authorize(Roles = "Administrador")]
     [HttpPost]
     public async Task<ActionResult> Delete(int id)
     {
@@ -90,7 +92,7 @@ public class MovementsController(LoggerService loggerService,
         }
         try
         {
-            delete.DeleteMovement(movement);
+            await delete.DeleteMovement(movement);
             loggerService.Log($"Movement deleted successfully for Account ID: {movement.CurrentAccountId}");
             return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
         }
