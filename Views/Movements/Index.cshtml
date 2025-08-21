@@ -1,0 +1,126 @@
+﻿@model IEnumerable<Movements>
+@{
+    ViewData["Title"] = "Movimientos";
+    Layout = "_Layout";
+    var sortOrder = Context.Request.Query["sortOrder"].ToString();
+    Func<string, string> sortLink = col =>
+    Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
+    var userId = @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+    var newMovement = new Movements
+    {
+        CurrentAccountId = ViewBag.CurrentAccountId,
+        CreatedByUserId = userId,
+        ModifiedByUserId = userId,
+    };
+}
+<h2>@ViewData["Title"]</h2>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
+    Agregar
+</button>
+
+<div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">
+   <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateMovementModallabel">Nuevo Movimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_Create", newMovement)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive" id="movementsTableContainer">
+    @await Html.PartialAsync("_MovementTable", Model)
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            function bindSortLinks() {
+                $('.sort-link').off('click').on('click', function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    $.get(url, function (data) {
+                        $('#movementsTableContainer').html(data);
+                        bindSortLinks();
+                    });
+                });
+            }
+            bindSortLinks();
+
+            $('#movementsTableContainer').on('click', '.delete-link', function (e) {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        success: function () {
+                            reloadTable();
+                        },
+                        error: function () {
+                            alert('Error al eliminar el movimiento.');
+                        }
+                    });
+                }
+            });
+
+            window.showDeleteConfirmation = function (id) {
+                if (confirm('¿Estás seguro de que deseas eliminar este movimiento?')) {
+                    $.ajax({
+                    type: 'POST',
+                    url: $('#deleteForm-' + id).attr('action'),
+                    data: $('#deleteForm-' + id).serialize(),
+                    success: function () {
+                        reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al eliminar el movimiento.');
+                    }
+                });
+                }
+            };
+
+            $('#CreateMovementModal').on('shown.bs.modal', function () {
+                $(this).find('form')[0]?.reset();
+            });
+            $('#CreateMovementModal').on('submit', 'form', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function () {
+                        $('#CreateMovementModal').modal('hide');
+                        reloadTable();
+                    },
+                    error: function (xhr) {
+                        alert("Error creating movement: " + xhr.responseText);
+                    }
+                });
+            });
+
+            function reloadTable() {
+                $.get('@Url.Action("Index")', function (data) {
+                    $('#movementsTableContainer').html(data);
+                    bindSortLinks();
+                });
+            }
+
+            $('#movementsTableContainer').on('click', '.sort-link', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.get(url, function (data) {
+                    $('#movementsTableContainer').html(data);
+                    bindSortLinks();
+                });
+            });
+        });
+    </script>
+}

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,13 +22,35 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                    <ul class="navbar-nav mr-auto">
+                        @{
+                            if (isAuthenticated)
+                            {
+                                if (User.IsInRole("Usuario") || User.IsInRole("Administrador"))
+                                {
+                                    <li class="nav-item ">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">Clientes</a>
+                                    </li>
+                                }
+                                if (User.IsInRole("SuperUser"))
+                                {
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link text-dark dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Administración
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <li>
+                                                <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="ListUsers">Usuarios</a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="ListRoles">Roles</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                }
+                            }
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

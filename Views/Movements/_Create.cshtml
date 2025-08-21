@@ -1,0 +1,35 @@
+﻿@model Movements
+
+<form asp-action="Create" asp-controller="Movements" id="createMovementForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <input type="hidden" asp-for="CurrentAccountId" />
+        <input type="hidden" asp-for="ModifiedByUserId" value="@Model.ModifiedByUserId" />
+        <input type="hidden" asp-for="CreatedByUserId" value="@Model.CreatedByUserId    " />
+    </div>
+    <div class="form-group">
+        <label asp-for="Debt" class="control-label">Tipo</label>
+        <select asp-for="Debt" class="form-control">
+            <option value="true">Ingreso</option>
+            <option value="false">Egreso</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label">Monto</label>
+        <input asp-for="Amount" class="form-control" />
+    </div>
+    <div class="accept-policy form-group">
+        <label asp-for="Date" class="control-label">Fecha</label>
+        <input asp-for="Date"
+               type="date"
+               class="form-control"
+               value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Descripcion</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+    <div class="modal-footer form-group">
+        <input type="submit" value="Ingresar" class="btn btn-primary" />
+    </div>
+</form>

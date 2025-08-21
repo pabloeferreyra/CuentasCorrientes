@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CurrentAccounts>
+
+<table class="table" id="currentAccountTable">
+    <thead>
+        <tr>
+            <th>Saldo</th>
+            <th>Fecha</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Debt.ToString("C")</td>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a asp-action="Index" asp-controller="Movements" asp-route-id="@item.Id" class="btn btn-primary">
+                            Movimientos
+                        </a>
+                        <form id="deleteForm-@item.Id" asp-action="Delete" asp-controller="CurrentAccount" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="button" class="btn btn-danger delete-link" onclick="showDeleteConfirmation(@item.Id)">Eliminar</button>
+                        </form>     
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

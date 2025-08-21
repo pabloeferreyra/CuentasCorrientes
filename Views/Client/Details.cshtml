@@ -1,0 +1,213 @@
+﻿@model Client
+
+<div>
+    <h4>Cliente @Model.CompanyName</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Surname)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Surname)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Cuit)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Cuit)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CompanyName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CompanyName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Telephone)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Telephone)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ClientType)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ClientType.Name)
+        </dd>
+    </dl>
+</div>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateCurrentAccountModal">
+    Nueva Cuenta Corriente
+</button>
+<div class="modal fade" id="CreateCurrentAccountModal" tabindex="-1" aria-labelledby="CreateCurrentAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateCurrentAccountModalLabel">Nueva Cuenta Corriente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("CurrentAccount/_Create", new CurrentAccounts{ClientId = Model.Id})
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.CurrentAccounts != null && Model.CurrentAccounts.Any())
+{
+    <h5>Cuentas Corrientes</h5>
+    <div class="table-responsive">
+        @await Html.PartialAsync("CurrentAccount/_CurrentAccountTable", Model.CurrentAccounts)
+    </div>
+}
+else
+{
+    <p>No hay cuentas corrientes asociadas a este cliente.</p>
+}
+<div>
+    <a type="button" class="btn btn-primary" asp-action="Index">Volver</a>
+</div>
+
+<div class="modal fade" id="editCurrentAccountModal" tabindex="-1" aria-labelledby="editCurrentAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCurrentAccountModalLabel">Editar Cuenta Corriente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- El contenido se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            function bindSortLinks() {
+                $('.sort-link').off('click').on('click', function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    $.get(url, function (data) {
+                        $('#currentAccountTableContainer').html(data);
+                        bindSortLinks();
+                    });
+                });
+            }
+            bindSortLinks();
+
+            window.showDeleteConfirmation = function (id) {
+                if (confirm('¿Estás seguro de que deseas eliminar esta cuenta corriente?')) {
+                    $.ajax({
+                    type: 'POST',
+                    url: $('#deleteForm-' + id).attr('action'),
+                    data: $('#deleteForm-' + id).serialize(),
+                    success: function () {
+                        reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al eliminar la cuenta corriente.');
+                    }
+                });
+                }
+            };
+
+            // Crear cuenta corriente
+            $('#CreateCurrentAccountModal').on('shown.bs.modal', function () {
+                $(this).find('form')[0]?.reset();
+            });
+            $('#CreateCurrentAccountModal').on('submit', 'form', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function () {
+                        $('#CreateCurrentAccountModal').modal('hide');
+                        reloadTable();
+                    }
+                });
+            });
+
+            // Editar cuenta corriente
+            $('#currentAccountTableContainer').on('click', '.edit-link', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.get(url, function (data) {
+                    $('#editCurrentAccountModal .modal-body').html(data);
+                    $('#editCurrentAccountModal').modal('show');
+                });
+            });
+            $('#editCurrentAccountModal').on('submit', 'form', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function () {
+                        $('#editCurrentAccountModal').modal('hide');
+                        reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al editar la cuenta corriente.');
+                    }
+                });
+            });
+
+            // Eliminar cuenta corriente
+            $('#currentAccountTableContainer').on('click', '.delete-link', function (e) {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres eliminar esta cuenta corriente?')) {
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        success: function () {
+                            reloadTable();
+                        },
+                        error: function () {
+                            alert('Error al eliminar la cuenta corriente.');
+                        }
+                    });
+                }
+            });
+
+            // Recargar tabla
+            function reloadTable() {
+                var clientId = '@Model.Id';
+                window.location.href = '@Url.Action("Details", "Client")' + '?id=' + clientId;
+            }
+
+            // Ordenar tabla
+            $('#currentAccountTableContainer').on('click', '.sort-link', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.get(url, function (data) {
+                    $('#currentAccountTableContainer').html(data);
+                    bindSortLinks();
+                });
+            });
+        });
+    </script>
+}
