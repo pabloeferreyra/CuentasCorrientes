@@ -7,9 +7,12 @@
         Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
 }
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateClientModal">
-    Nuevo Cliente
-</button>
+@if (User.IsInRole("Administrador"))
+{
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateClientModal">
+        Nuevo Cliente
+    </button>
+}
 <div class="modal fade" id="CreateClientModal" tabindex="-1" aria-labelledby="CreateClientModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

@@ -3,7 +3,6 @@
 <table class="table" id="movementsTable">
     <thead>
         <tr>
-            <th>Id</th>
             <th></th>
             <th>Monto</th>
             <th>Fecha</th>
@@ -16,7 +15,6 @@
         @foreach (var movement in Model)
         {
             <tr>
-                <td>@movement.Id</td>
                 @{
                     if(movement.Debt)
                     {
