@@ -26,10 +26,7 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@master
         with:
-          host: ${{ secrets.SERVER }}
-          username: ${{ secrets.USER_NAME }}
-          port: ${{ secrets.PORT }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       
       - name: Create ZIP
         uses: montudor/action-zip@master
