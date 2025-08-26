@@ -1,13 +1,18 @@
 ﻿@model CurrentAccounts
 
-<form asp-action="Create" asp-controller="CurrentAccount" id="createCurrentAccountForm">
+<form method="post"  id="createCurrentAccountForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
         <input type="hidden" asp-for="ClientId" />
     </div>
     <div class="form-group">
         <label asp-for="Debt" class="control-label"></label>
-        <input asp-for="Debt" class="form-control" value="0" />
+        <input asp-for="Debt"
+               class="form-control"
+               placeholder="0"
+               min="0"
+               step="0.01" 
+               oninput="this.value = this.value.replace(/[^0-9,]/g, '');" />
     </div>
     <div class="form-group">
         <label asp-for="Date" class="control-label"></label>
@@ -18,6 +23,6 @@
                />
     </div>
     <div class="modal-footer form-group">
-        <input type="submit" value="Ingresar" class="btn btn-primary" />
+        <input type="submit" id="newAccount" value="Ingresar" class="btn btn-primary" />
     </div>
 </form>
