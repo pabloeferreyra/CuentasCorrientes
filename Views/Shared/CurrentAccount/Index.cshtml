@@ -73,7 +73,7 @@
                 var form = $(this);
                 $.ajax({
                     type: 'POST',
-                    url: form.attr('action'),
+                    url: '/CurrentAccount/Create',
                     data: form.serialize(),
                     success: function () {
                         $('#CreateCurrentAccountModal').modal('hide');
