@@ -3,22 +3,11 @@
 
 name: .NET
 
-on: 
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-        - info
-        - warning
-        - debug
+on:
   push:
-    branches: [ "master, develop" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "master, develop" ]
+    branches: [ master ]
   
 
 jobs:
