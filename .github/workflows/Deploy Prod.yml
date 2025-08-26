@@ -42,7 +42,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             # Detener servicio
-            service cc stop
+            service CuentasCorrientes stop
     
       - name: copy file via ssh
         uses: appleboy/scp-action@master
@@ -66,4 +66,4 @@ jobs:
             unzip -o ${{ secrets.SRV_PATH }}/CCApp.zip
             rm ${{ secrets.SRV_PATH }}/CCApp.zip
             cp ${{ secrets.SRV_PATH }}/appsettings.json.bak ${{ secrets.SRV_PATH }}/CCApp/appsettings.json
-            service cc start
+            service CuentasCorrientes start
