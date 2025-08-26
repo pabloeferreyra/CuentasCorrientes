@@ -65,5 +65,5 @@ jobs:
             # Reiniciar servicio
             unzip -o ${{ secrets.SRV_PATH }}/CCApp.zip
             rm ${{ secrets.SRV_PATH }}/CCApp.zip
-            cp ${{ secrets.SRV_PATH }}/appsettings.json.bak ${{ secrets.SRV_PATH }}/CCApp/appsettings.json
+            cp ${{ secrets.SRV_PATH }}/appsettings.ccapp.json.bak ${{ secrets.SRV_PATH }}/CCApp/appsettings.json
             service CuentasCorrientes start
