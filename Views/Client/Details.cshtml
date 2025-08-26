@@ -133,18 +133,26 @@ else
 
             // Crear cuenta corriente
             $('#CreateCurrentAccountModal').on('shown.bs.modal', function () {
-                $(this).find('form')[0]?.reset();
+                    $(this).find('form')[0]?.reset();
             });
             $('#CreateCurrentAccountModal').on('submit', 'form', function (e) {
+                debugger    
                 e.preventDefault();
-                var form = $(this);
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                let formData = $("#createCurrentAccountForm").serialize();
                 $.ajax({
                     type: 'POST',
-                    url: form.attr('action'),
-                    data: form.serialize(),
+                    url: '/CurrentAccount/Create',
+                    header: token,
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: formData,
                     success: function () {
                         $('#CreateCurrentAccountModal').modal('hide');
                         reloadTable();
+                    },
+                    error: function () {
+                        alert('Error al crear la cuenta corriente.');
                     }
                 });
             });

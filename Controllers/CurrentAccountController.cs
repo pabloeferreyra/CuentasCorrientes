@@ -1,6 +1,6 @@
 ﻿namespace CuentasCorrientes.Controllers;
 
-[Authorize(Roles = "Admin,User, SuperUser")]
+[Authorize(Roles = "Administrador, Usuario, SuperUser")]
 public class CurrentAccountController(LoggerService loggerService,
     IGetCurrentAccountService get,
     ICreateCurrentAccountService create,
@@ -48,7 +48,7 @@ public class CurrentAccountController(LoggerService loggerService,
     public async Task<ActionResult> Create(CurrentAccounts currentAccount)
     {
         loggerService.Log("CurrentAccount Create POST action called.");
-        if (ModelState.IsValid)
+            if (ModelState.IsValid)
         {
             try
             {

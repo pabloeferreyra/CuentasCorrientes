@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Identity;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-   options.UseNpgsql(builder.Configuration.GetConnectionString("localConnection")));
+   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
@@ -95,6 +93,8 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UsePathBase("/CCApp");
 
 app.UseHttpsRedirection();
 app.UseRouting();
