@@ -21,4 +21,7 @@ public class Client
     [DisplayName("Tipo")]
     public ClientType? ClientType { get; set; }
     public ICollection<CurrentAccounts>? CurrentAccounts { get; set; }
+    [DisplayName("Balance")]
+    [NotMapped]
+    public double Account { get; set; }
 }

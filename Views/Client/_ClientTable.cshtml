@@ -16,16 +16,14 @@
                 </a>
             </th>
             <th>@Html.DisplayNameFor(model => model.Cuit)</th>
-            <th>@Html.DisplayNameFor(model => model.Address)</th>
             <th>@Html.DisplayNameFor(model => model.CompanyName)</th>
-            <th>@Html.DisplayNameFor(model => model.Email)</th>
-            <th>@Html.DisplayNameFor(model => model.Telephone)</th>
             <th>
                 <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Type" ? "Type_desc" : "Type" })" class="link-dark link-underline-opacity-0" data-sort="ClientType.Name">
                     @Html.DisplayNameFor(model => model.ClientType)
                     @(ViewBag.SortOrder?.StartsWith("Type") == true ? (ViewBag.SortOrder.EndsWith("_desc") ? " ▼" : " ▲") : "")
                 </a>
             </th>
+            <th>@Html.DisplayNameFor(Model => Model.Account)</th>
             <th></th>
         </tr>
     </thead>
@@ -33,14 +31,12 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.Surname)</td>
-                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@item.Surname</td>
+                <td>@item.Name</td>
                 <td>@Html.DisplayFor(modelItem => item.Cuit, "Cuit")</td>
-                <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                <td>@Html.DisplayFor(modelItem => item.CompanyName)</td>
-                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                <td>@Html.DisplayFor(modelItem => item.Telephone)</td>
-                <td>@Html.DisplayFor(modelItem => item.ClientType.Name)</td>
+                <td>@item.CompanyName</td>
+                <td>@item.ClientType.Name</td>
+                <td>@item.Account.ToString("C")</td>
                 <td>
                     <a class="btn btn-primary" href="@Url.Action("Details", "Client", new { id = item.Id })">Detalle</a>
                     

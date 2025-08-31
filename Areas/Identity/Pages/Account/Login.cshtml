@@ -5,36 +5,47 @@
     ViewData["Title"] = "Ingresar";
 }
 
-<h1>@ViewData["Title"]</h1>
 <div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Ingrese con su cuenta.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+    <div class="col-12">
+
+        <section class="dvh-100">
+            <div class="container py-5 dh-100">
+                <div class="row d-flex align-items-center justify-content-center dh-100">
+                    <div class="col-md-8 col-lg-7 col-xl-6">
+                        <img src="/logo.png"
+                             class="img-fluid">
+                    </div>
+                    <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+                        <form id="account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <!-- Email input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input asp-for="Input.Email" class="form-control form-control-lg" autocomplete="username" aria-required="true" placeholder="tuusuario@mp.com" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- Password input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input asp-for="Input.Password" type="password" class="form-control form-control-lg" autocomplete="current-password" aria-required="true" placeholder="contraseña" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex mb-4">
+                                <!-- Checkbox -->
+                                <div class="form-check">
+                                    <input asp-for="Input.RememberMe" class="form-check-input" type="checkbox"/>
+                                    <label asp-for="Input.RememberMe" class="form-check-label"> Recordarme en este dispositivo </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit button -->
+                            <button type="submit" class="w-100 btn btn-lg btn-primary">Ingresar</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="contraseña" />
-                    <label asp-for="Input.Password" class="form-label">Contraseña</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        Recordarme en este dispositivo
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Ingresar</button>
-                </div>
-            </form>
+            </div>
         </section>
-    </div>
+    </div>  
 </div>
 
 @section Scripts {

@@ -17,9 +17,10 @@
     <div class="form-group">
         <label asp-for="Amount" class="control-label">Monto</label>
         <input asp-for="Amount" class="form-control" placeholder="0"
-               min="0"
-               step="0.01" 
-               oninput="this.value = this.value.replace(/[^0-9,]/g, '');" />
+                value=""
+                min="0"
+                step="0.01" 
+                oninput="this.value = this.value.replace(/[^0-9,]/g, '');" />
     </div>
     <div class="accept-policy form-group">
         <label asp-for="Date" class="control-label">Fecha</label>

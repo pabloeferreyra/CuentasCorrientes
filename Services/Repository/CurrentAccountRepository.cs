@@ -46,9 +46,14 @@ public class CurrentAccountRepository(LoggerService loggerService, ApplicationDb
     {
         return await FindByCondition(ca => ca.ClientId == clientId).Include(ca => ca.Client).ToListAsync();
     }
-    public async Task<CurrentAccounts?> GetCurrentAccountByClientId(int clientId) => await FindByCondition(ca => ca.ClientId == clientId)
-            .Include(ca => ca.Client)
-            .FirstOrDefaultAsync();
+    public async Task<CurrentAccounts?> GetCurrentAccountByClientId(int clientId)
+    {
+        CurrentAccounts accounts = await FindByCondition(ca => ca.ClientId == clientId)
+            .Include(ca => ca.Client).Include(m => m.Movements).FirstOrDefaultAsync();
+        accounts.Debt = accounts.Movements.Sum(m => m.Amount);
+        return accounts;
+    }
+
     public async Task UpdateCurrentAccount(CurrentAccounts currentAccount)
     {
         if (currentAccount == null)
