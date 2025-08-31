@@ -36,7 +36,7 @@ public class ClientRepository(LoggerService loggerService, ApplicationDbContext 
 
     public Task<List<Client>> GetAllClients()
     {
-        return FindAll().Include(c => c.ClientType).ToListAsync();
+        return FindAll().Include(c => c.ClientType).Include(c => c.CurrentAccounts).ToListAsync();
     }
 
     public Task<Client?> GetClient(int id)

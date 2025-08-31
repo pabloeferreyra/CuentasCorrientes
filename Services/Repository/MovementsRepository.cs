@@ -35,25 +35,20 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
         loggerService.Log($"Creating Movement for Account ID: {movement.CurrentAccountId}");
-        movement.Date = DateTime.UtcNow.Date;
+        movement.Date = DateTime.Today.Date;
+        
+        movement.Amount = !movement.Debt ? -Math.Abs(movement.Amount) : Math.Abs(movement.Amount);
+
         await context.Movements.AddAsync(movement);
-        await context.CurrentAccounts.FirstAsync(ca => ca.Id == movement.CurrentAccountId)
-            .ContinueWith(ca => 
-            {
-                if (ca.Result != null)
-                {
-                    if(movement.Debt == false)
-                    {
-                        ca.Result.Debt += movement.Amount;
-                    }
-                    else
-                    {
-                        ca.Result.Debt -= movement.Amount;
-                    }
-                    context.CurrentAccounts.Update(ca.Result);
-                }
-            });
         await context.SaveChangesAsync();
+        var current = await context.CurrentAccounts.FirstAsync(ca => ca.Id == movement.CurrentAccountId);
+        if (current != null)
+        {
+            current.Debt += movement.Amount;
+            context.CurrentAccounts.Update(current);
+            await context.SaveChangesAsync();
+        }
+        
     }
     public async Task UpdateMovement(Movements movement)
     {
@@ -74,16 +69,14 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
         loggerService.Log($"Deleting Movement for Account ID: {movement.CurrentAccountId}");
-        await context.CurrentAccounts.FirstAsync(ca => ca.Id == movement.CurrentAccountId)
-            .ContinueWith(ca =>
-            {
-                if (ca.Result != null)
-                {
-                    ca.Result.Debt += movement.Amount;
-                    context.CurrentAccounts.Update(ca.Result);
-                }
-            });
         context.Movements.Remove(movement);
         context.SaveChanges();
+        var account = await context.CurrentAccounts.Include(m => m.Movements).FirstAsync(ca => ca.Id == movement.CurrentAccountId);
+        if(account != null)
+        {
+            account.Debt = account.Movements?.Sum(c => c.Amount) ?? 0;
+            context.CurrentAccounts.Update(account);
+            context.SaveChanges();
+        }
     }
 }
