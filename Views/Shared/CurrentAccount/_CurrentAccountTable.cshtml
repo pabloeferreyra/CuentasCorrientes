@@ -5,6 +5,7 @@
         <tr>
             <th>Saldo</th>
             <th>Fecha</th>
+            <th>Descripcion</th>
             <th></th>
         </tr>
     </thead>
@@ -14,6 +15,7 @@
             <tr>
                 <td>@item.Debt.ToString("C")</td>
                 <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Description</td>
                 <td>
                     <div class="d-flex gap-2">
                         <a asp-action="Index" asp-controller="Movements" asp-route-id="@item.Id" class="btn btn-primary">

@@ -16,7 +16,16 @@ public class GetClientService(IClientRepository repository) : IGetClientService
         var client = await repository.GetClient(clientId);
         return client ?? throw new InvalidOperationException($"No se encontró Cliente con id {clientId}.");
     }
-    public async Task<List<Client>> GetAllClients() => await repository.GetAllClients();
+    public async Task<List<Client>> GetAllClients()
+    {
+        List <Client> clients = await repository.GetAllClients();
+        foreach (Client c in clients)
+        {
+            c.Account = c.CurrentAccounts?.Where(cc => cc.Debt != 0)
+                                         .Sum(cc => cc.Debt) ?? 0;
+        }
+        return clients;
+    }
     public async Task<Client> GetClient(string clientName)
     {
         var client = await repository.GetClient(clientName);

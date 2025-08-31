@@ -13,6 +13,7 @@ public class Movements
     public required string ModifiedByUserId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
+    [NotMapped]
     public bool Debt { get; set; }
 
 }

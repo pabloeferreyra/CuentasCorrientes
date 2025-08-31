@@ -49,19 +49,19 @@ public class CurrentAccountController(LoggerService loggerService,
     {
         loggerService.Log("CurrentAccount Create POST action called.");
             if (ModelState.IsValid)
-        {
-            try
             {
-                await create.CreateCurrentAccount(currentAccount);
-                loggerService.Log($"CurrentAccount created successfully for Client ID: {currentAccount.ClientId}");
-                return Ok();
+                try
+                {
+                    await create.CreateCurrentAccount(currentAccount);
+                    loggerService.Log($"CurrentAccount created successfully for Client ID: {currentAccount.ClientId}");
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    loggerService.Log($"Error creating CurrentAccount: {ex.Message}");
+                    ModelState.AddModelError("", "Error creating CurrentAccount. Please try again.");
+                }
             }
-            catch (Exception ex)
-            {
-                loggerService.Log($"Error creating CurrentAccount: {ex.Message}");
-                ModelState.AddModelError("", "Error creating CurrentAccount. Please try again.");
-            }
-        }
         return View(currentAccount);
     }
 

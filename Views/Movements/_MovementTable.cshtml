@@ -3,7 +3,6 @@
 <table class="table" id="movementsTable">
     <thead>
         <tr>
-            <th></th>
             <th>Monto</th>
             <th>Fecha</th>
             <th>Descripcion</th>
@@ -15,17 +14,7 @@
         @foreach (var movement in Model)
         {
             <tr>
-                @{
-                    if(movement.Debt)
-                    {
-                        <td>I</td>
-                    }
-                    else
-                    {
-                        <td>E</td>
-                    }
-                }
-                <td>@movement.Amount.ToString("C")</td>
+                <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
                 <td>@movement.Date.ToShortDateString()</td>
                 <td>@movement.Description</td>
                 <td>@movement.CreatedByUserId</td>
