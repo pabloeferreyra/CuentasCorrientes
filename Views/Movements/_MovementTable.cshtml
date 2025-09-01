@@ -19,10 +19,13 @@
                 <td>@movement.Description</td>
                 <td>@movement.CreatedByUserId</td>
                 <td>
-                <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
-                <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
-                    @Html.AntiForgeryToken()
-                </form>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
+                    <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
+                        @Html.AntiForgeryToken()
+                    </form>
+                }
                 </td>
             </tr>
         }
