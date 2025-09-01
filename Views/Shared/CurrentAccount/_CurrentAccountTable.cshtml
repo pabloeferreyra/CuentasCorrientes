@@ -21,10 +21,14 @@
                         <a asp-action="Index" asp-controller="Movements" asp-route-id="@item.Id" class="btn btn-primary">
                             Movimientos
                         </a>
+                    @if (User.IsInRole("Administrador"))
+                    {
                         <form id="deleteForm-@item.Id" asp-action="Delete" asp-controller="CurrentAccount" method="post">
                             <input type="hidden" name="id" value="@item.Id" />
+                            
                             <button type="button" class="btn btn-danger delete-link" onclick="showDeleteConfirmation(@item.Id)">Eliminar</button>
                         </form>     
+                    }
                     </div>
                 </td>
             </tr>
