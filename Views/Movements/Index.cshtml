@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Movements>
 @{
-    ViewData["Title"] = "Movimientos";
+    ViewData["Title"] = String.Format("{0} {1}","Cuenta Corriente: ", ViewBag.ClientName);
     Layout = "_Layout";
     var sortOrder = Context.Request.Query["sortOrder"].ToString();
     Func<string, string> sortLink = col =>
@@ -15,8 +15,8 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-
-<h3>Saldo: @Model.Sum(m => m.Amount).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</h3>
+<br />
+<h5>Saldo: @Model.Sum(m => m.Amount).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</h5>
 <div class="row">
     <div class="col-1">
         <button type="button" class="btn btn-primary no-print" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
@@ -24,8 +24,8 @@
         </button>
     </div>
 
-    <div class="col-2 no-print">
-        <button type ="button" class="btn btn-dark no-print" onclick="window.print()">🖨️ Imprimir</button>
+    <div class="col-11 no-print">
+        <button type="button" class="btn btn-dark no-print float-end" onclick="window.print()">🖨️ Imprimir</button>
     </div>
 </div>
 

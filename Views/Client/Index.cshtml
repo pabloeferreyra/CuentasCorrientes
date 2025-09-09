@@ -3,9 +3,16 @@
     ViewData["Title"] = "Clientes";
     Layout = "_Layout";
     var sortOrder = Context.Request.Query["sortOrder"].ToString() ?? string.Empty;
+    var searchString = Context.Request.Query["searchString"].ToString() ?? string.Empty;
     Func<string, string> sortLink = col =>
         Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
 }
+<form method="get" class="mb-3" id="searchForm">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Buscar cliente..." value="@searchString" />
+        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+    </div>
+</form>
 
 @if (User.IsInRole("Administrador"))
 {

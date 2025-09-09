@@ -4,11 +4,15 @@ public interface IClientRepository
 {
     Task<Client?> GetClient(int id);
     Task<List<Client>> GetAllClients();
+    Task<List<Client>> GetClientsForUser();
+    Task<List<Client>> SearchClients(string clientSearchName);
+    Task<List<Client>> SearchAdminClients(string clientSearchName);
     Task<Client?> GetClient(string clientName);
     Task<List<Client>> GetClientsByType(int clientTypeId);
     Task CreateClient(Client client);
     Task UpdateClient(Client client);
     void DeleteClient(Client client);
+    Task<Client?> GetClientByCurrentAccountId(int currentAccountId);
 }
 public class ClientRepository(LoggerService loggerService, ApplicationDbContext context) : BaseRepository<Client>(context), IClientRepository
 {
@@ -39,6 +43,21 @@ public class ClientRepository(LoggerService loggerService, ApplicationDbContext 
         return FindAll().Include(c => c.ClientType).Include(c => c.CurrentAccounts).ToListAsync();
     }
 
+    public Task<List<Client>> GetClientsForUser()
+    {
+        return FindByCondition(c => c.Administrative == false).Include(c => c.ClientType).Include(c => c.CurrentAccounts).ToListAsync();
+    }
+
+    public Task<List<Client>> SearchClients(string clientSearchName)
+    {
+        return FindByCondition(c => (c.Name.ToUpper().Contains(clientSearchName.ToUpper()) || c.Surname.ToUpper().Contains(clientSearchName.ToUpper())) && c.Administrative == false).Include(c => c.ClientType).Include(c => c.CurrentAccounts).ToListAsync();
+    }
+
+    public Task<List<Client>> SearchAdminClients(string clientSearchName)
+    {
+        return FindByCondition(c => c.Name.ToUpper().Contains(clientSearchName.ToUpper()) || c.Surname.ToUpper().Contains(clientSearchName.ToUpper()    )).Include(c => c.ClientType).Include(c => c.CurrentAccounts).ToListAsync();
+    }
+
     public Task<Client?> GetClient(int id)
     {
         return FindByCondition(c => c.Id == id).Include(c => c.ClientType).Include(ca => ca.CurrentAccounts).FirstOrDefaultAsync();
@@ -52,6 +71,18 @@ public class ClientRepository(LoggerService loggerService, ApplicationDbContext 
             throw new ArgumentException("El nombre del cliente no puede ser nulo o vacío.", nameof(clientName));
         }
         return FindByCondition(c => c.Name == clientName).Include(c => c.ClientType).Include(ca => ca.CurrentAccounts).FirstOrDefaultAsync();
+    }
+
+    public Task<Client?> GetClientByCurrentAccountId(int currentAccountId)
+    {
+        if(currentAccountId <= 0)
+        {
+            loggerService.Log("Attempted to get a Client with an invalid CurrentAccountId.");
+            throw new ArgumentException("El CurrentAccountId debe ser mayor que cero.", nameof(currentAccountId));
+        }
+        return context.Clients.Include(c => c.ClientType)
+                              .Include(c => c.CurrentAccounts)
+                              .FirstOrDefaultAsync(c => c.CurrentAccounts.Any(ca => ca.Id == currentAccountId));
     }
 
     public Task<List<Client>> GetClientsByType(int clientTypeId)

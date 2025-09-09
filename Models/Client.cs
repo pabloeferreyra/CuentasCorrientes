@@ -24,4 +24,11 @@ public class Client
     [DisplayName("Balance")]
     [NotMapped]
     public double Account { get; set; }
+    [DisplayName("Solo Administrador")]
+    public bool Administrative { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Surname}, {Name} - {Cuit}";
+    }
 }
