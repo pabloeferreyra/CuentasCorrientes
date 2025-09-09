@@ -13,11 +13,21 @@
         ModifiedByUserId = userId,
     };
 }
+
 <h2>@ViewData["Title"]</h2>
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
-    Agregar
-</button>
+<h3>Saldo: @Model.Sum(m => m.Amount).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</h3>
+<div class="row">
+    <div class="col-1">
+        <button type="button" class="btn btn-primary no-print" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
+        Agregar
+        </button>
+    </div>
+
+    <div class="col-2 no-print">
+        <button type ="button" class="btn btn-dark no-print" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+</div>
 
 <div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">
    <div class="modal-dialog">

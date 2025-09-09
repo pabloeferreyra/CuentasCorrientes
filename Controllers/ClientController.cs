@@ -27,7 +27,7 @@ public class ClientController(LoggerService loggerService,
             "Surname_desc" => [.. clients.OrderByDescending(c => c.Surname)],
             "Type" => [.. clients.OrderBy(c => c.ClientType?.Name)],
             "Type_desc" => [.. clients.OrderByDescending(c => c.ClientType?.Name)],
-            _ => [.. clients.OrderBy(c => c.Name)]
+            _ => [.. clients.OrderBy(c => c.Surname)]
         };
         ViewBag.SortOrder = sortOrder;
         if (Request.Headers.XRequestedWith == "XMLHttpRequest")

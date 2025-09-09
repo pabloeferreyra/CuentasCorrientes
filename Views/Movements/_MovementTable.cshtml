@@ -3,30 +3,47 @@
 <table class="table" id="movementsTable">
     <thead>
         <tr>
-            <th>Monto</th>
+            
             <th>Fecha</th>
             <th>Descripcion</th>
-            <th>Usuario</th>
-            <th>Acciones</th>
+            <th>Debe</th>
+            <th>Haber</th>
+            @if (User.IsInRole("Administrador"))
+            {
+                <th class="no-print">Usuario</th>
+                <th class="no-print">Acciones</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var movement in Model)
         {
             <tr>
-                <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
-                <td>@movement.Date.ToShortDateString()</td>
+                
+                <td>@movement.Date.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
                 <td>@movement.Description</td>
-                <td>@movement.CreatedByUserId</td>
-                <td>
+                @if(movement.Amount > 0)
+                {
+                    <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                    <td></td>
+                }
+                else
+                {
+                    <td></td>
+                    <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                }
                 @if (User.IsInRole("Administrador"))
                 {
-                    <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
-                    <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
-                        @Html.AntiForgeryToken()
-                    </form>
+                    <td class="no-print">@movement.CreatedByUserId</td>
+                    <td class="no-print">
+                
+                        <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
+                        <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
+                            @Html.AntiForgeryToken()
+                        </form>
+                
+                    </td>
                 }
-                </td>
             </tr>
         }
     </tbody>
