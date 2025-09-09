@@ -30,7 +30,7 @@
                 else
                 {
                     <td></td>
-                    <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                    <td style="background-color: red; color:white;">@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
                 }
                 @if (User.IsInRole("Administrador"))
                 {
@@ -44,7 +44,7 @@
                 
                     </td>
                 }
-            </tr>
+            </tr>   
         }
     </tbody>
 </table>

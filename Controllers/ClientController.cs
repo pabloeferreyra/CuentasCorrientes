@@ -8,9 +8,11 @@ public class ClientController(LoggerService loggerService,
     IDeleteClientService delete,
     IGetClientTypeService getClientType) : Controller
 {
-    public async Task<ActionResult> Index(string sortOrder)
+    public async Task<ActionResult> Index(string searchString, string sortOrder)
     {
+        string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
         List<ClientType> clientTypes = await getClientType.GetAllClientTypes();
+        
         ViewBag.ClientTypes = clientTypes.Select(ct => new SelectListItem
         {
             Value = ct.Id.ToString(),
@@ -18,7 +20,32 @@ public class ClientController(LoggerService loggerService,
         }).ToList();
 
         loggerService.Log("Client Index action called.");
-        List<Client> clients = await get.GetAllClients();
+        
+        List<Client> clients = [];
+
+        if (string.IsNullOrEmpty(searchString))
+        {
+            if (role == "Administrador")
+            {
+                clients = await get.GetAllClients();
+            }
+            else
+            {
+                clients = await get.GetClientsForUser();
+            }
+        }
+        else
+        {
+            if (role == "Administrador")
+            {
+                clients = await get.SearchAdminClients(searchString);
+            }
+            else
+            {
+                clients = await get.SearchClients(searchString);
+            }
+        }
+        
         clients = sortOrder switch
         {
             "Name" => [.. clients.OrderBy(c => c.Name)],

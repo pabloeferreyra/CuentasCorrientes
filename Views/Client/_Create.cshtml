@@ -41,6 +41,11 @@
         <select asp-for="ClientTypeId" class="form-select" asp-items="ViewBag.ClientTypes"></select>
         <span asp-validation-for="ClientTypeId" class="text-danger"></span>
     </div>
+    <br />
+    <div class="form-group">
+        <label asp-for="Administrative" class="control-label col-11 text-danger"></label>
+        <input asp-for="Administrative" class="form-check-input col-1" />
+    </div>
 
     <div class="modal-footer form-group">
         <input type="submit" value="Ingresar" class="btn btn-primary" />

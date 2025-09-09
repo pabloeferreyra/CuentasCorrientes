@@ -4,9 +4,13 @@
 public interface IGetClientService
 {
     Task<Client> GetClient(int clientId);
+    Task<List<Client>> SearchClients(string clientSearchName);
+    Task<List<Client>> SearchAdminClients(string clientSearchName);
     Task<List<Client>> GetAllClients();
+    Task<List<Client>> GetClientsForUser();
     Task<Client> GetClient(string clientName);
     Task<List<Client>> GetClientsByType(int clientTypeId);
+    Task<Client> GetClientByCurrentAccountId(int currentAccountId);
 
 }
 public class GetClientService(IClientRepository repository) : IGetClientService
@@ -26,12 +30,50 @@ public class GetClientService(IClientRepository repository) : IGetClientService
         }
         return clients;
     }
+    public async Task<List<Client>> GetClientsForUser()
+    {
+        List<Client> clients = await repository.GetClientsForUser();
+        foreach (Client c in clients)
+        {
+            c.Account = c.CurrentAccounts?.Where(cc => cc.Debt != 0)
+                                         .Sum(cc => cc.Debt) ?? 0;
+        }
+        return clients;
+    }
+    public async Task<List<Client>> SearchClients(string clientSearchName)
+    {
+        List<Client> clients = await repository.SearchClients(clientSearchName);
+        foreach (Client c in clients)
+        {
+            c.Account = c.CurrentAccounts?.Where(cc => cc.Debt != 0)
+                                         .Sum(cc => cc.Debt) ?? 0;
+        }
+        return clients;
+    }
+
+    public async Task<List<Client>> SearchAdminClients(string clientSearchName)
+    {
+        List<Client> clients = await repository.SearchAdminClients(clientSearchName);
+        foreach (Client c in clients)
+        {
+            c.Account = c.CurrentAccounts?.Where(cc => cc.Debt != 0)
+                                         .Sum(cc => cc.Debt) ?? 0;
+        }
+        return clients;
+    }
+
     public async Task<Client> GetClient(string clientName)
     {
         var client = await repository.GetClient(clientName);
         return client ?? throw new InvalidOperationException($"No se encontró Cliente con nombre {clientName}.");
     }
     public async Task<List<Client>> GetClientsByType(int clientTypeId) => await repository.GetClientsByType(clientTypeId);
+
+    public Task<Client> GetClientByCurrentAccountId(int currentAccountId)
+    {
+        var client = repository.GetClientByCurrentAccountId(currentAccountId);
+        return client ?? throw new InvalidOperationException($"No se encontró Cliente con Cuenta Corriente id {currentAccountId}.");
+    }
 }
 #endregion
 
