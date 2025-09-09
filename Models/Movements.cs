@@ -15,5 +15,4 @@ public class Movements
     public DateTime ModifiedAt { get; set; }
     [NotMapped]
     public bool Debt { get; set; }
-
 }

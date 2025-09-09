@@ -5,22 +5,25 @@ public class MovementsController(LoggerService loggerService,
     IGetMovementService get,
     ICreateMovementService create,
     IUpdateMovementService update,
-    IDeleteMovementService delete) : Controller
+    IDeleteMovementService delete, 
+    IGetClientService getClient) : Controller
 {
     public async Task<ActionResult> Index(int id, string sortOrder)
     {
         loggerService.Log($"Movements Index action called for Account ID: {id}");
+        Client client = await getClient.GetClientByCurrentAccountId(id);
         List<Movements> movements = await get.GetMovementsByCurrentAccountId(id);
         movements = sortOrder switch
         {
             "Date" => [.. movements.OrderBy(m => m.Date)],
             "Date_desc" => [.. movements.OrderByDescending(m => m.Date)],
-            _ => [.. movements.OrderBy(m => m.Id)]
+            _ => [.. movements.OrderBy(m => m.Date)]
         };
         ViewBag.SortOrder = sortOrder;
         if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             return PartialView("_MovementTable", movements);
         ViewBag.CurrentAccountId = id;
+        ViewBag.ClientName = client.ToString();
         return View(movements);
     }
     
