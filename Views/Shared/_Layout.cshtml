@@ -10,10 +10,12 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/print.css" />
     <link rel="stylesheet" href="~/CuentasCorrientes.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
+    <header class="print no-print">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <img src="~/ico.png" style="width:32px;"/><a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cuentas Corrientes</a>
@@ -65,7 +67,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Cuentas Corrientes
+            &copy; 2025 - CPN Maria Paula Ferreyra
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

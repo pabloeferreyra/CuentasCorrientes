@@ -12,7 +12,7 @@ public class Client
     public string? Cuit { get; set; }
     [DisplayName("Direccion")]
     public string? Address { get; set; }
-    [DisplayName("Empresa")]
+    [DisplayName("Identificador")]
     public string? CompanyName { get; set; }
     public string? Email { get; set; }
     [DisplayName("Telefono")]
