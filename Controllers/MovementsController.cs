@@ -49,7 +49,7 @@ public class MovementsController(LoggerService loggerService,
             {
                 await create.CreateMovement(movement);
                 loggerService.Log($"Movement created successfully for Account ID: {movement.CurrentAccountId}");
-                return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
+                return RedirectToAction(nameof(Index), new { id = movement.CurrentAccountId });
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ public class MovementsController(LoggerService loggerService,
                 ModelState.AddModelError("", "Error creating Movement. Please try again.");
             }
         }
-        return RedirectToAction(nameof(Index), new {currentAccountId = movement.CurrentAccountId});
+        return RedirectToAction(nameof(Index), new {id = movement.CurrentAccountId});
     }
 
     [Authorize(Roles = "Administrador")]
