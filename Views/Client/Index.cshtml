@@ -6,12 +6,21 @@
     var searchString = Context.Request.Query["searchString"].ToString() ?? string.Empty;
     Func<string, string> sortLink = col =>
         Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
+
 }
+<!-- Formulario de búsqueda mejorado -->
 <form method="get" class="mb-3" id="searchForm">
     <div class="input-group">
-        <input type="text" name="searchString" class="form-control" placeholder="Buscar cliente..." value="@searchString" />
-        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        <input type="text" id="searchInput" name="searchString" class="form-control"
+               placeholder="Buscar cliente..." value="@searchString"
+               autocomplete="off" />
+        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
     </div>
+    <small class="text-muted">
+        <span id="searchResults">Mostrando todos los clientes</span>
+    </small>
 </form>
 
 @if (User.IsInRole("Administrador"))
@@ -50,169 +59,7 @@
 <div class="table-responsive" id="clientTableContainer">
     @await Html.PartialAsync("_ClientTable", Model)
 </div>
+<script src="~/js/client.js"></script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <script>
-        $(function () {
-            function bindSortLinks() {
-                $('.sort-link').off('click').on('click', function (e) {
-                    e.preventDefault();
-                    var url = $(this).attr('href');
-                    $.get(url, function (data) {
-                        $('#clientTypeTableContainer').html(data);
-                        bindSortLinks();
-                    });
-                });
-            }
-
-            bindSortLinks();
-
-            $('#createClientForm').submit(function (e) {
-                e.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    success: function () {
-                        $('#CreateClientModal').modal('hide');
-                        reloadTable();
-                    },
-                    error: function () {
-                        alert('Error al crear el cliente.');
-                    }
-                });
-            });
-            $('#editClientModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var url = '@Url.Action("Edit", "Client")/' + id;
-                $.get(url, function (data) {
-                    $('#editClientModal .modal-body').html(data);
-                });
-            });
-            $('#editClientModal').on('submit', '#editClientForm', function (e) {
-                e.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    success: function () {
-                        $('#editClientModal').modal('hide');
-                        reloadTable();
-                    },
-                    error: function () {
-                        alert('Error al editar el cliente.');
-                    }
-                });
-            });
-            window.showDeleteConfirmation = function (id) {
-                if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
-                    $.ajax({
-                    type: 'POST',
-                    url: $('#deleteForm-' + id).attr('action'),
-                    data: $('#deleteForm-' + id).serialize(),
-                    success: function () {
-                        reloadTable();
-                    },
-                    error: function () {
-                        alert('Error al eliminar el tipo de cliente.');
-                    }
-                });
-                }
-            };
-            
-            function reloadTable() {
-                $.get('@Url.Action("Index", "Client")', function (data) {
-                    $('#clientTableContainer').html(data);
-                    bindSortLinks();
-                });
-            }
-
-            $('#clientTableContainer').on('click', '.sort-link', function (e) {
-                e.preventDefault();
-                var url = $(this).attr('href');
-                $.get(url, function (data) {
-                    $('#clientTableContainer').html(data);
-                    bindSortLinks();
-                });
-            });
-        });
-
-        $(function() {
-            $('#Cuit').on('focusout', function() {
-                var value = $(this).val().replace(/\D/g, '');
-                if(value.length === 11) {
-                    var formatted = value.substr(0, 2) + '-' + value.substr(2, 8) + '-' + value.substr(10, 1);
-                    $(this).val(formatted);
-                    $('#cuitFormatted').text('');
-                } else {
-                    $('#cuitFormatted').text('CUIT inválido');
-                }
-            });
-        });
-
-        $(function() {
-            $('#Email').on('focusout', function() {
-                var email = $(this).val().trim();
-                var emailSpan = $('#emailFormatted');
-                var emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
-
-                if(!emailRegex.test(email)) {
-                    emailSpan.text('Correo inválido');
-                }
-                else{
-                    emailSpan.text('');
-                }
-            });
-        });
-
-        $(function() {
-            $('#Name').on('focusout', function() {
-                var name = $(this).val().trim();
-                var nameSpan = $('#nameFormatted');
-
-                if(name.length === 0) {
-                    nameSpan.text('El nombre es obligatorio');
-                } else {
-                    var formatted = name.split(' ').map(function(word) {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                    }).join(' ');
-                    $(this).val(formatted);
-                    nameSpan.text('');
-                }
-            });
-        });
-        $(function() {
-            $('#Surname').on('focusout', function() {
-                var name = $(this).val().trim();
-                var nameSpan = $('#surnameFormatted');
-
-                if(name.length === 0) {
-                    nameSpan.text('El apellido es obligatorio');
-                } else {
-                    var formatted = name.split(' ').map(function(word) {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                    }).join(' ');
-                    $(this).val(formatted);
-                    nameSpan.text('');
-                }
-            });
-        });
-
-        $(function() {
-            $('#CompanyName').on('focusout', function() {
-                var name = $(this).val().trim();
-                if(name.length === 0) {
-                } else {
-                    var formatted = name.split(' ').map(function(word) {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                    }).join(' ');
-                    $(this).val(formatted);
-                }
-            });
-        });
-    </script>
 }
