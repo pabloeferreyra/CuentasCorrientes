@@ -26,7 +26,7 @@
 @if (User.IsInRole("Administrador"))
 {
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateClientModal">
-        Nuevo Cliente
+        <i class="bi bi-plus-circle me-1"></i> Nuevo Cliente
     </button>
 }
 <div class="modal fade" id="CreateClientModal" tabindex="-1" aria-labelledby="CreateClientModalLabel" aria-hidden="true">
@@ -47,7 +47,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
+                <h5 class="modal-title" id="editClientModalLabel"><i class="bi bi-pencil-square me-1"></i> Editar Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
@@ -59,7 +59,7 @@
 <div class="table-responsive" id="clientTableContainer">
     @await Html.PartialAsync("_ClientTable", Model)
 </div>
-<script src="~/js/client.js"></script>
+<script src="~/js/Client.js"></script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
