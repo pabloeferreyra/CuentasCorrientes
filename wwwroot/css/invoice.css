@@ -1,0 +1,37 @@
+﻿.invoice-header {
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+.header-row {
+    position: fixed;
+    top: 135px;
+    left: 0;
+    right: 0;
+    page-break-inside: avoid;
+}
+
+.invoice-title {
+    font-weight: 700;
+}
+
+.company-info {
+    text-align: right;
+}
+
+.invoice-details {
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.invoice-table th {
+    background-color: #808080;
+    color: white;
+    border: none;
+}
+
+.invoice-total {
+    background-color: #808080;
+    border: 2px solid #808080;
+    border-radius: 8px;
+    padding: 20px;
+}

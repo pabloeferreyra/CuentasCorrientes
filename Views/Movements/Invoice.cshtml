@@ -1,0 +1,82 @@
+﻿@model Invoice
+@{
+    ViewData["Title"] = "Invoice";
+}
+<script>
+    window.onload = function() {
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    };
+
+    window.onafterprint = function() {
+        setTimeout(function() {
+            window.location.href = '@Url.Action("Index", "Movements", new { id = Model.Id })';
+        }, 1000); 
+    };
+</script>
+<button class="btn btn-dark no-print float-end" onclick="window.print()">
+    <i class="bi bi-printer"></i> Imprimir
+</button>
+<a type="button" class="btn btn-primary no-print" asp-action="Index" asp-controller="Client">Volver</a>
+
+<div class="container mt-4">
+	@await Html.PartialAsync("_headerPrint")
+
+    <div class="invoice-details row">
+        <div class="mt-1 col-4">
+            <h5 class="mb-3">
+                <i class="bi bi-person-circle"></i> RECIBIMOS DE:
+            </h5>
+        </div>
+        <div class="mt-1 col-8">
+            <p class="mb-3">
+                @Model.Name @Model.LastName
+            </p>
+        </div>
+        <div class="col-4">
+            <h5 class="mb-3">CUIT:</h5>
+        </div>
+        <div class="col-3">
+            <p class="mb-3">@Model.Cuit</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">
+                <i class="bi bi-list-check"></i> DETALLE DEL COMPROBANTE:
+            </h5>
+            <div class="table-responsive">
+                <table class="table invoice-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="10%">Fecha</th>
+                            <th scope="col" width="50%">Descripción</th>
+                            <th scope="col" width="10%">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@Model.Date.ToString("dd/MM/yyyy")</td>
+                            <td>@Model.Description</td>
+                            <td><strong>@Model.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-end">
+        <div class="col-md-6 col-lg-4">
+            <div class="invoice-total">
+                <div class="d-flex justify-content-between">
+                    <strong class="fs-5">TOTAL:</strong>
+                    <strong class="fs-5 text-white">@Model.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+	@await Html.PartialAsync("_FooterGeneric")
+</div>  

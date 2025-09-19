@@ -1,4 +1,6 @@
-﻿namespace CuentasCorrientes.Controllers;
+﻿using CuentasCorrientes.Models;
+
+namespace CuentasCorrientes.Controllers;
 
 [Authorize(Roles = "Usuario, Administrador")]
 public class MovementsController(LoggerService loggerService,
@@ -49,7 +51,38 @@ public class MovementsController(LoggerService loggerService,
             {
                 await create.CreateMovement(movement);
                 loggerService.Log($"Movement created successfully for Account ID: {movement.CurrentAccountId}");
-                return RedirectToAction(nameof(Index), new { id = movement.CurrentAccountId });
+                var client = await getClient.GetClientByCurrentAccountId(movement.CurrentAccountId);
+                
+                // Si es una petición AJAX, devolver la URL de redirección
+                Invoice invoice = new()
+                {
+                    Name = client.Name,
+                    LastName = client.Surname,
+                    Cuit = client.Cuit,
+                    Date = movement.Date,
+                    Description = movement.Description,
+                    Amount = (decimal)movement.Amount,
+                    Id = movement.CurrentAccountId
+                };
+                if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+                {
+                    string? redirectUrl = movement.Debt
+                        ? Url.Action(nameof(Invoice), invoice)
+                        : Url.Action(nameof(Index), new { id = movement.CurrentAccountId });
+
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl
+                    });
+                }
+                else
+                {
+                    return movement.Debt
+                        ? RedirectToAction(nameof(Invoice), invoice)
+                        : RedirectToAction(nameof(Index), new { id = movement.CurrentAccountId });
+                }
+                
             }
             catch (Exception ex)
             {
@@ -97,7 +130,7 @@ public class MovementsController(LoggerService loggerService,
         {
             await delete.DeleteMovement(movement);
             loggerService.Log($"Movement deleted successfully for Account ID: {movement.CurrentAccountId}");
-            return RedirectToAction(nameof(Index), new { currentAccountId = movement.CurrentAccountId });
+            return RedirectToAction(nameof(Index), new { id = movement.CurrentAccountId });
         }
         catch (Exception ex)
         {
@@ -105,5 +138,10 @@ public class MovementsController(LoggerService loggerService,
             ModelState.AddModelError("", "Error deleting Movement. Please try again.");
             return View(movement);
         }
+    }
+
+    public ActionResult Invoice(Invoice invoice)
+    {
+        return View("Invoice", invoice);
     }
 }
