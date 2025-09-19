@@ -11,7 +11,7 @@ public class MovementsController(LoggerService loggerService,
     IGetClientService getClient) : Controller
 {
     public async Task<ActionResult> Index(int id, string sortOrder)
-    {
+        {
         loggerService.Log($"Movements Index action called for Account ID: {id}");
         Client client = await getClient.GetClientByCurrentAccountId(id);
         List<Movements> movements = await get.GetMovementsByCurrentAccountId(id);
@@ -130,7 +130,7 @@ public class MovementsController(LoggerService loggerService,
         {
             await delete.DeleteMovement(movement);
             loggerService.Log($"Movement deleted successfully for Account ID: {movement.CurrentAccountId}");
-            return RedirectToAction(nameof(Index), new { id = movement.CurrentAccountId });
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -140,6 +140,24 @@ public class MovementsController(LoggerService loggerService,
         }
     }
 
+    public async Task<ActionResult> ManualPrint(int id)
+    {
+        Movements movement = await get.GetMovementById(id);
+        Client client = await getClient.GetClientByCurrentAccountId(movement.CurrentAccountId);
+        Invoice invoice = new()
+        {
+            Name = client.Name,
+            LastName = client.Surname,
+            Cuit = client.Cuit,
+            Date = movement.Date,
+            Description = movement.Description,
+            Amount = (decimal)movement.Amount,
+            Id = movement.CurrentAccountId
+        };
+        return RedirectToAction(nameof(Invoice), invoice);
+    }
+
+    [HttpGet, HttpPost]
     public ActionResult Invoice(Invoice invoice)
     {
         return View("Invoice", invoice);

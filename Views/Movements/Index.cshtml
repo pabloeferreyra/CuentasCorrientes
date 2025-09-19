@@ -1,46 +1,95 @@
 ﻿@model IEnumerable<Movements>
-@{
-    ViewData["Title"] = String.Format("{0} {1}","Cuenta Corriente: ", ViewBag.ClientName);
+@{ 
+    ViewData["Title"]= $"Cuenta Corriente: { ViewBag.ClientName }";
+
     Layout = "_Layout";
     var sortOrder = Context.Request.Query["sortOrder"].ToString();
-    Func<string, string> sortLink = col =>
-    Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
-    var userId = @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-    var newMovement = new Movements
-    {
-        CurrentAccountId = ViewBag.CurrentAccountId,
-        CreatedByUserId = userId,
-        ModifiedByUserId = userId,
-    };
+    Func<string, string> sortLink = col => Url.Action("Index", new { sortOrder = sortOrder == col ? col + "_desc" : col }) ?? string.Empty;
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+    var currentBalance = Model.Sum(m => m.Amount);        
+    var newMovement = new Movements { CurrentAccountId = ViewBag.CurrentAccountId, CreatedByUserId = userId, ModifiedByUserId = userId };
 }
 
 @await Html.PartialAsync("_headerPrint")
 
-<h2 class="mt-2">@ViewData["Title"]</h2>
-<br />
-<h5>Saldo: @Model.Sum(m => m.Amount).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</h5>
-<div class="row">
-    <div class="col-1">
-        <button type="button" class="btn btn-primary no-print" data-bs-toggle="modal" data-bs-target="#CreateMovementModal">
-        Agregar
-        </button>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-1">@ViewData["Title"]</h2>
+                    <h5 class="text-muted">
+                        Saldo: 
+                        <span class="@(currentBalance >= 0 ? "text-success" : "text-danger")">
+                            @currentBalance.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))
+                        </span>
+                    </h5>
+                </div>
+                
+                <div class="btn-group no-print" role="group">
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#CreateMovementModal"
+                            title="Agregar nuevo movimiento">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar
+                    </button>
+                    
+                    <button class="btn btn-outline-secondary" 
+                            onclick="window.print()"
+                            title="Imprimir cuenta corriente">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="col-11 no-print">
-        <button class="btn btn-dark no-print float-end" onclick="window.print()">
-            <i class="bi bi-printer"></i> Imprimir
-        </button>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="text-center p-3" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Toast container for notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span class="toast-message"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span class="toast-message"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table container -->
+    <div class="table-responsive position-relative" id="movementsTableContainer">
+        @await Html.PartialAsync("_MovementTable", Model)
     </div>
 </div>
 
-
-
-<div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">
-   <div class="modal-dialog">
+<!-- Modal para crear movimiento -->
+<div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="CreateMovementModallabel">Nuevo Movimiento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="CreateMovementModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Nuevo Movimiento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 @await Html.PartialAsync("_Create", newMovement)
@@ -49,103 +98,11 @@
     </div>
 </div>
 
-<div class="table-responsive" id="movementsTableContainer">
-    @await Html.PartialAsync("_MovementTable", Model)
-</div>
-
 @await Html.PartialAsync("_FooterGeneric")
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        $(function () {
-            function bindSortLinks() {
-                $('.sort-link').off('click').on('click', function (e) {
-                    e.preventDefault();
-                    var url = $(this).attr('href');
-                    $.get(url, function (data) {
-                        $('#movementsTableContainer').html(data);
-                        bindSortLinks();
-                    });
-                });
-            }
-            bindSortLinks();
-
-            $('#movementsTableContainer').on('click', '.delete-link', function (e) {
-                e.preventDefault();
-                if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
-                    var url = $(this).attr('href');
-                    $.ajax({
-                        type: 'POST',
-                        url: url,
-                        success: function () {
-                            reloadTable();
-                        },
-                        error: function () {
-                            alert('Error al eliminar el movimiento.');
-                        }
-                    });
-                }
-            });
-
-            window.showDeleteConfirmation = function (id) {
-                if (confirm('¿Estás seguro de que deseas eliminar este movimiento?')) {
-                    $.ajax({
-                    type: 'POST',
-                    url: $('#deleteForm-' + id).attr('action'),
-                    data: $('#deleteForm-' + id).serialize(),
-                    success: function () {
-                        reloadTable();
-                    },
-                    error: function () {
-                        alert('Error al eliminar el movimiento.');
-                    }
-                });
-                }
-            };
-
-            $('#CreateMovementModal').on('shown.bs.modal', function () {
-                $(this).find('form')[0]?.reset();
-            });
-            $('#CreateMovementModal').on('submit', 'form', function (e) {
-                e.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    success: function (response) {
-                        if (response.success && response.redirectUrl) {
-                            // Redireccionar a la página de Invoice
-                            window.location.href = response.redirectUrl;
-                        } else if (response.success) {
-                            $('#CreateMovementModal').modal('hide');
-                            reloadTable();
-                        } else {
-                            alert("Error: " + (response.error || "Unknown error"));
-                        }
-                    },
-                    error: function (xhr) {
-                        alert("Error creating movement: " + xhr.responseText);
-                    }
-                });
-            });
-
-            function reloadTable() {
-                $.get('@Url.Action("Index")', function (data) {
-                    $('#movementsTableContainer').html(data);
-                    bindSortLinks();
-                });
-            }
-
-            $('#movementsTableContainer').on('click', '.sort-link', function (e) {
-                e.preventDefault();
-                var url = $(this).attr('href');
-                $.get(url, function (data) {
-                    $('#movementsTableContainer').html(data);
-                    bindSortLinks();
-                });
-            });
-        });
-    </script>
+    
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+   
+    <script src="~/js/Movements.js"></script>
 }

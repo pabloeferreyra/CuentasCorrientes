@@ -35,7 +35,6 @@ public class MovementsRepository(LoggerService loggerService, ApplicationDbConte
             throw new ArgumentNullException(nameof(movement), "El Movement no puede ser nulo.");
         }
         loggerService.Log($"Creating Movement for Account ID: {movement.CurrentAccountId}");
-        movement.Date = DateTime.Today.Date;
         
         movement.Amount = !movement.Debt ? -Math.Abs(movement.Amount) : Math.Abs(movement.Amount);
 
