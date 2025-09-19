@@ -30,14 +30,35 @@ body {
   text-align: start;
 }
 
+.only-print {
+    display: none;
+}
+
 @media print {
+    .only-print {
+        display: block;
+    }
     .no-print {
         display: none !important;
     }
 
     @page {
         size: A4;
-        margin: 15mm;
+    }
+    
+    .footer-print {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        page-break-inside: avoid;
+    }
+    .header-print {
+        position: fixed;
+        top: 135px;
+        left: 0;
+        right: 0;
+        page-break-inside: avoid;
     }
 }
 

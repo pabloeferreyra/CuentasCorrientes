@@ -14,7 +14,9 @@
     };
 }
 
-<h2>@ViewData["Title"]</h2>
+@await Html.PartialAsync("_headerPrint")
+
+<h2 class="mt-2">@ViewData["Title"]</h2>
 <br />
 <h5>Saldo: @Model.Sum(m => m.Amount).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</h5>
 <div class="row">
@@ -25,9 +27,13 @@
     </div>
 
     <div class="col-11 no-print">
-        <button type="button" class="btn btn-dark no-print float-end" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn btn-dark no-print float-end" onclick="window.print()">
+            <i class="bi bi-printer"></i> Imprimir
+        </button>
     </div>
 </div>
+
+
 
 <div class="modal fade" id="CreateMovementModal" tabindex="-1" aria-labelledby="CreateMovementModallabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -46,6 +52,8 @@
 <div class="table-responsive" id="movementsTableContainer">
     @await Html.PartialAsync("_MovementTable", Model)
 </div>
+
+@await Html.PartialAsync("_FooterGeneric")
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -106,9 +114,16 @@
                     type: 'POST',
                     url: form.attr('action'),
                     data: form.serialize(),
-                    success: function () {
-                        $('#CreateMovementModal').modal('hide');
-                        reloadTable();
+                    success: function (response) {
+                        if (response.success && response.redirectUrl) {
+                            // Redireccionar a la página de Invoice
+                            window.location.href = response.redirectUrl;
+                        } else if (response.success) {
+                            $('#CreateMovementModal').modal('hide');
+                            reloadTable();
+                        } else {
+                            alert("Error: " + (response.error || "Unknown error"));
+                        }
                     },
                     error: function (xhr) {
                         alert("Error creating movement: " + xhr.responseText);
