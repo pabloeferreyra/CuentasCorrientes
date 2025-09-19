@@ -1,25 +1,22 @@
 ﻿$(function () {
     let originalTableRows = [];
     let filteredTableRows = [];
-    let currentSortOrder = '';
     let currentPage = 1;
-    let itemsPerPage = 10; // Cantidad de elementos por página
+    let itemsPerPage = 10; 
     let totalPages = 1;
 
-    // Inicializar datos de la tabla
     function initializeTableData() {
         originalTableRows = [];
         $('#clientTableContainer tbody tr').each(function () {
             const row = $(this);
 
-            // Crear texto de búsqueda excluyendo la columna de acciones (última columna)
             let searchText = '';
             row.find('td').not(':last').each(function () {
                 searchText += $(this).text().toLowerCase() + ' ';
             });
 
             const rowData = {
-                element: row.clone(true), // Clonar con eventos
+                element: row.clone(true), 
                 searchText: searchText.trim(),
                 name: row.find('td:nth-child(1)').text().trim(),
                 surname: row.find('td:nth-child(2)').text().trim(),
@@ -32,14 +29,12 @@
         });
     }
 
-    // Función de búsqueda en tiempo real
     function performSearch(searchTerm) {
         const searchLower = searchTerm.toLowerCase().trim();
 
         if (searchLower === '') {
             filteredTableRows = [...originalTableRows];
         } else {
-            // Filtrar filas basado en el término de búsqueda
             filteredTableRows = originalTableRows.filter(function (rowData) {
                 return rowData.searchText.includes(searchLower) ||
                     rowData.name.toLowerCase().includes(searchLower) ||
@@ -51,13 +46,11 @@
             });
         }
 
-        // Resetear a la primera página cuando se hace una nueva búsqueda
         currentPage = 1;
         updatePagination();
         displayCurrentPage(searchTerm);
     }
 
-    // Función para mostrar la página actual
     function displayCurrentPage(searchTerm = '') {
         const tbody = $('#clientTableContainer tbody');
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -93,7 +86,6 @@
         updatePaginationControls();
     }
 
-    // Actualizar información de paginación
     function updatePagination() {
         totalPages = Math.ceil(filteredTableRows.length / itemsPerPage);
         if (currentPage > totalPages && totalPages > 0) {
@@ -104,7 +96,6 @@
         }
     }
 
-    // Actualizar controles de paginación
     function updatePaginationControls() {
         let paginationHtml = '';
 
@@ -119,11 +110,9 @@
                         </li>
             `;
 
-            // Lógica para mostrar números de página
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
 
-            // Ajustar si estamos cerca del inicio o final
             if (currentPage <= 3) {
                 endPage = Math.min(5, totalPages);
             }
@@ -131,7 +120,6 @@
                 startPage = Math.max(1, totalPages - 4);
             }
 
-            // Primera página y puntos suspensivos
             if (startPage > 1) {
                 paginationHtml += `
                     <li class="page-item">
@@ -147,7 +135,6 @@
                 }
             }
 
-            // Páginas numéricas
             for (let i = startPage; i <= endPage; i++) {
                 paginationHtml += `
                     <li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -156,7 +143,6 @@
                 `;
             }
 
-            // Última página y puntos suspensivos
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                     paginationHtml += `
@@ -208,7 +194,6 @@
             `;
         }
 
-        // Insertar o actualizar controles de paginación
         let paginationContainer = $('#paginationContainer');
         if (paginationContainer.length === 0) {
             $('#clientTableContainer').after('<div id="paginationContainer"></div>');
@@ -216,17 +201,14 @@
         }
         paginationContainer.html(paginationHtml);
     }
-
-    // Resaltar términos de búsqueda
     function highlightSearchTerm(row, searchTerm) {
         if (searchTerm.trim() === '') return row;
 
-        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');    // Resaltar términos de búsqueda
+        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     function highlightSearchTerm(row, searchTerm) {
                 if (searchTerm.trim() === '') return row;
 
                 const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-                // Solo resaltar en las celdas que no son la columna de acciones (última columna)
                 row.find('td').not(':last').each(function () {
                     const cell = $(this);
                     const html = cell.html();
@@ -235,16 +217,12 @@
                 });
                 return row;
             }
-        // Solo resaltar en las celdas que no son la columna de acciones (última columna)
         row.find('td').not(':last').each(function () {
                 const cell = $(this);
 
-                // Verificar si la celda contiene elementos HTML (como spans)
                 if (cell.find('*').length > 0) {
-                    // Si tiene elementos HTML, trabajar solo con nodos de texto
                     highlightTextNodes(cell, regex);
                 } else {
-                    // Si es solo texto, usar el método original
                     const html = cell.html();
                     const highlightedHtml = html.replace(regex, '<mark class="bg-warning">$1</mark>');
                     cell.html(highlightedHtml);
@@ -253,26 +231,22 @@
         return row;
     }
 
-    // Función auxiliar para resaltar solo en nodos de texto
     function highlightTextNodes(element, regex) {
         element.contents().each(function () {
-            if (this.nodeType === 3) { // Nodo de texto
+            if (this.nodeType === 3) { 
                 const text = $(this).text();
                 if (regex.test(text)) {
                     const highlightedText = text.replace(regex, '<mark class="bg-warning">$1</mark>');
                     $(this).replaceWith(highlightedText);
                 }
-            } else if (this.nodeType === 1) { // Elemento HTML
-                // Recursivamente procesar elementos hijos, pero solo si no son elementos de formato
+            } else if (this.nodeType === 1) {
                 const tagName = this.tagName.toLowerCase();
-                if (tagName !== 'mark') { // Evitar resaltar dentro de marks existentes
+                if (tagName !== 'mark') { 
                     highlightTextNodes($(this), regex);
                 }
             }
         });
     }
-
-    // Actualizar contador de resultados
     function updateSearchResults() {
         const resultsSpan = $('#searchResults');
         const startIndex = (currentPage - 1) * itemsPerPage + 1;
@@ -280,32 +254,29 @@
 
         if (filteredTableRows.length === originalTableRows.length) {
             if (totalPages > 1) {
-                resultsSpan.text(`Mostrando ${startIndex}-${endIndex} de ${originalTableRows.length} clientes`);
+                resultsSpan.text(`Mostrando ${startIndex}-${endIndex} clientes`);
             } else {
-                resultsSpan.text(`Mostrando todos los clientes (${originalTableRows.length})`);
+                resultsSpan.text(`Mostrando todos los clientes`);
             }
         } else {
             if (totalPages > 1) {
-                resultsSpan.text(`Mostrando ${startIndex}-${endIndex} de ${filteredTableRows.length} clientes encontrados (${originalTableRows.length} total)`);
+                resultsSpan.text(`Mostrando ${startIndex}-${endIndex} clientes encontrados `);
             } else {
-                resultsSpan.text(`Mostrando ${filteredTableRows.length} de ${originalTableRows.length} clientes`);
+                resultsSpan.text(`Mostrando ${filteredTableRows.length} clientes`);
             }
         }
     }
 
-    // Event listeners para búsqueda
     $('#searchInput').on('input keyup', function () {
         const searchTerm = $(this).val();
         performSearch(searchTerm);
     });
 
-    // Botón limpiar búsqueda
     $('#clearSearch').on('click', function () {
         $('#searchInput').val('').focus();
         performSearch('');
     });
 
-    // Event listeners para paginación
     $(document).on('click', '.page-link[data-page]', function (e) {
         e.preventDefault();
         const page = parseInt($(this).data('page'));
@@ -316,36 +287,30 @@
         }
     });
 
-    // Event listener para cambio de elementos por página
     $(document).on('change', '#itemsPerPageSelect', function () {
         itemsPerPage = parseInt($(this).val());
-        currentPage = 1; // Resetear a primera página
+        currentPage = 1; 
         updatePagination();
         const currentSearch = $('#searchInput').val();
         displayCurrentPage(currentSearch);
     });
 
-    // Prevenir submit del formulario
     $('#searchForm').on('submit', function (e) {
         e.preventDefault();
         return false;
     });
 
-    // Función para recargar tabla y reinicializar datos
     function reloadTable() {
-        // Necesitas pasar la URL desde la vista
         const indexUrl = window.clientIndexUrl || '/Client/Index';
         $.get(indexUrl, function (data) {
             $('#clientTableContainer').html(data);
             initializeTableData();
             bindSortLinks();
 
-            // Reinicializar paginación
             currentPage = 1;
             filteredTableRows = [...originalTableRows];
             updatePagination();
 
-            // Mantener búsqueda actual después de recargar
             const currentSearch = $('#searchInput').val();
             if (currentSearch) {
                 performSearch(currentSearch);
@@ -354,8 +319,6 @@
             }
         });
     }
-
-    // Manejo de ordenamiento
     function bindSortLinks() {
         $('.sort-link').off('click').on('click', function (e) {
             e.preventDefault();
@@ -367,12 +330,10 @@
                 initializeTableData();
                 bindSortLinks();
 
-                // Reinicializar paginación después de ordenar
                 currentPage = 1;
                 filteredTableRows = [...originalTableRows];
                 updatePagination();
 
-                // Reaplicar búsqueda después de ordenar
                 if (currentSearch) {
                     $('#searchInput').val(currentSearch);
                     performSearch(currentSearch);
@@ -383,16 +344,13 @@
         });
     }
 
-    // Inicializar todo
     initializeTableData();
     bindSortLinks();
 
-    // Inicializar paginación
     filteredTableRows = [...originalTableRows];
     updatePagination();
     displayCurrentPage();
 
-    // Manejo de modales y formularios
     $(document).on('submit', '#createClientForm', function (e) {
         e.preventDefault();
         var form = $(this);
@@ -413,7 +371,6 @@
     $('#editClientModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var id = button.data('id');
-        // Necesitas pasar la URL desde la vista
         const editUrl = window.clientEditUrl || '/Client/Edit';
         var url = editUrl + '/' + id;
         $.get(url, function (data) {
@@ -438,7 +395,6 @@
         });
     });
 
-    // Función global para confirmación de eliminación
     window.showDeleteConfirmation = function (id) {
         if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
             $.ajax({
@@ -455,7 +411,6 @@
         }
     };
 
-    // Validaciones de campos
     $(document).on('focusout', '#Cuit', function () {
         var value = $(this).val().replace(/\D/g, '');
         if (value.length === 11) {

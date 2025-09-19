@@ -1,6 +1,4 @@
-﻿using CuentasCorrientes.Helpers;
-
-namespace CuentasCorrientes.Services.Repository;
+﻿namespace CuentasCorrientes.Services.Repository;
 
 public interface ICurrentAccountRepository
 {
