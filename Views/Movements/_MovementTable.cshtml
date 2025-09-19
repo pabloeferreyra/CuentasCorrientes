@@ -30,18 +30,22 @@
                 else
                 {
                     <td></td>
-                    <td style="background-color: red; color:white;">@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                    <td style="background-color: #bb2d3b; color:white;">@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
                 }
                 @if (User.IsInRole("Administrador"))
                 {
                     <td class="no-print">@movement.CreatedByUserId</td>
                     <td class="no-print">
-                
-                        <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id)">Eliminar</button>
-                        <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
-                            @Html.AntiForgeryToken()
-                        </form>
-                
+                        <div class="btn-group no-print" role="group">
+                        <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@movement.Id, @ViewBag.CurrentAccountId)"><i class="bi bi-x me-1"></i> Eliminar</button>
+                            <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
+                                @Html.AntiForgeryToken()
+                            </form>
+                            @if (movement.Amount > 0)
+                            {
+                                <a type="button" class="btn btn-outline-secondary" id="printForm-@movement.Id" method="post" asp-action="ManualPrint" asp-route-id="@movement.Id"> <i class="bi bi-printer me-1"></i> Imprimir recibo</a>
+                            }
+                        </div>
                     </td>
                 }
             </tr>   
