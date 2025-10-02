@@ -32,3 +32,13 @@ public class Client
         return $"{Surname}, {Name} - {Cuit}";
     }
 }
+
+public class ClientDto
+{
+    public int Id { get; set; }
+    public string Surname { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Cuit { get; set; } = string.Empty;
+    [NotMapped]
+    public ICollection<Balance> Movements { get; set; } = new List<Balance>();
+}

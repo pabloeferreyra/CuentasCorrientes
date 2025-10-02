@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Balance>
+<table class="table" id="balanceTable">
+	<thead>
+		<tr>
+			<th>Fecha</th>
+			<th>Descripcion</th>
+			<th>Cliente</th>
+			<th>Debe</th>
+			<th>Haber</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.Date.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+				<td>@item.Description</td>
+				<td>@($"{item.Name} {item.Surname}")</td>
+				@if(item.Amount > 0)
+				{
+					<td>@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+					<td></td>
+				}
+				else
+				{
+					<td></td>
+					<td style="background-color: #bb2d3b; color:white;">@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+				}
+			</tr>   
+		}
+	</tbody>
+</table>

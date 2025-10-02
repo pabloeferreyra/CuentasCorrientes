@@ -35,11 +35,19 @@ body {
 }
 
 @media print {
-    .only-print {
-        display: block;
-    }
+    
     .no-print {
         display: none !important;
+    }
+
+    /* Ensure header is part of the normal flow when printing (not fixed),
+       so it will appear only once on the first page instead of repeating. */
+    .only-print, .invoice-header {
+        display: block;
+        position: static !important;
+        z-index: 1000;
+        page-break-inside: avoid;
+        page-break-after: avoid;
     }
 
     @page {
@@ -49,13 +57,6 @@ body {
     .footer-print {
         position: fixed;
         bottom: 20px;
-        left: 0;
-        right: 0;
-        page-break-inside: avoid;
-    }
-    .header-print {
-        position: fixed;
-        top: 135px;
         left: 0;
         right: 0;
         page-break-inside: avoid;

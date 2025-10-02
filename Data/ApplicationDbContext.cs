@@ -5,13 +5,12 @@
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) : IdentityDbContext(options)
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-
+        public DbSet<ClientDto> ClientsDto { get; set; }
         public DbSet<Client> Clients { get; set; } = null!;
         public DbSet<ClientType> ClientTypes { get; set; } = null!;
         public DbSet<CurrentAccounts> CurrentAccounts { get; set; } = null!;
         public DbSet<Movements> Movements { get; set; } = null!;
-
-        public override int SaveChanges()
+    public override int SaveChanges()
         {
             SetAuditFields();
             return base.SaveChanges();
@@ -54,8 +53,8 @@
                 .WithMany(ct => ct.Clients)
                 .HasForeignKey(c => c.ClientTypeId);
             var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
-                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // al guardar
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)            // al leer
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
             );
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -68,6 +67,12 @@
                     }
                 }
             }
+
+            modelBuilder.Entity<Balance>(entity =>
+            {
+                entity.HasNoKey();  // Es una función, no una tabla
+                entity.ToFunction("get_movements_with_client");
+            });
             base.OnModelCreating(modelBuilder);
         }
     }
