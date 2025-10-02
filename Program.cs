@@ -45,6 +45,9 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ICurrentAccountRepository, CurrentAccountRepository>();
 builder.Services.AddScoped<IMovementsRepository, MovementsRepository>();
 
+builder.Services.AddScoped<IBalanceService, BalanceService>();
+builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
+
 #region Claims
 foreach (var claim in ClaimsStore.RoleCLaims)
 {

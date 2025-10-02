@@ -36,6 +36,12 @@
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">Clientes</a>
                                     </li>
                                 }
+                                if(User.IsInRole("Administrador"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Balance" asp-action="Index">Balance</a>
+                                    </li>
+								}
                                 if (User.IsInRole("SuperUser"))
                                 {
                                     <li class="nav-item dropdown">

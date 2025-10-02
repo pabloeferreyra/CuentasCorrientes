@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Balance>
+@{
+
+    Layout = "_Layout";
+    var currentBalance = Model.Sum(m => m.Amount);
+}
+@await Html.PartialAsync("_headerPrint")
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="no-print d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-1">@ViewData["Title"]</h2>
+                    <h5 class="text-muted">
+                        Balance:
+                        <span class="@(currentBalance >= 0 ? "text-success" : "text-danger")">
+                            @currentBalance.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))
+                        </span>
+                    </h5>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <form method="get" asp-controller="Balance" asp-action="Index" class="d-flex align-items-center me-2">
+                        @{ 
+                            int selectedYear = ViewData["Year"] is int y ? y : DateTime.Now.Year;
+                            int selectedMonth = ViewData["Month"] is int m ? m : DateTime.Now.Month;
+                        }
+
+                        <label for="yearInput" class="me-2 mb-0">Año</label>
+                        <input id="yearInput" name="year" type="number" class="form-control me-2" value="@selectedYear" min="1900" max="2100" style="width:100px;" required />
+
+                        <label for="monthSelect" class="me-2 mb-0">Mes</label>
+                        <select id="monthSelect" name="month" class="form-select me-2" style="width:160px;" required>
+                            @{ 
+                                string[] monthNames = new[] { "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre" };
+                                for (int i = 1; i <= 12; i++)
+                                {
+                                    var selectedAttr = i == selectedMonth ? " selected" : "";
+                                    var optionHtml = $"<option value=\"{i}\"{selectedAttr}>{monthNames[i - 1]} ({i})</option>";
+                                    @Html.Raw(optionHtml);
+                                }
+                            }
+                        </select>
+
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+
+                    <button class="btn btn-outline-secondary" onclick="window.print()" title="Imprimir Balance">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="text-center p-3" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Toast container for notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span class="toast-message"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span class="toast-message"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table container -->
+    <div class="table-responsive position-relative" id="balanceTableContainer">
+        @await Html.PartialAsync("_BalanceTable", Model)
+    </div>
+</div>
+
+@await Html.PartialAsync("_FooterGeneric")
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/js/Movements.js"></script>
+}
