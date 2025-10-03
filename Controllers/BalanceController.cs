@@ -71,7 +71,7 @@ public class BalanceController(LoggerService loggerService,
         sb.AppendLine("</tbody></table>");
         sb.AppendLine("</body></html>");
 
-        var fileName = $"Balance_{resolvedYear}_{resolvedMonth}.xlsx";
+        var fileName = $"Balance_{resolvedYear}_{resolvedMonth}.xls";
         var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
 
         // Return as Excel file
