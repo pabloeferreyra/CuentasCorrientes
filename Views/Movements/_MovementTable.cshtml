@@ -32,6 +32,15 @@
                     <td></td>
                     <td style="background-color: #bb2d3b; color:white;">@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
                 }
+                <td class="no-print">
+                    <div class="btn-group no-print" role="group">
+                    
+                        @if (movement.Amount > 0)
+                        {
+                            <a type="button" class="btn btn-outline-secondary" id="printForm-@movement.Id" method="post" asp-action="ManualPrint" asp-route-id="@movement.Id"> <i class="bi bi-printer me-1"></i> Imprimir recibo</a>
+                        }
+                    </div>
+                </td>
                 @if (User.IsInRole("Administrador"))
                 {
                     <td class="no-print">@movement.CreatedByUserId</td>
@@ -41,10 +50,6 @@
                             <form id="deleteForm-@movement.Id" method="post" asp-action="Delete" asp-route-id="@movement.Id" style="display:none;">
                                 @Html.AntiForgeryToken()
                             </form>
-                            @if (movement.Amount > 0)
-                            {
-                                <a type="button" class="btn btn-outline-secondary" id="printForm-@movement.Id" method="post" asp-action="ManualPrint" asp-route-id="@movement.Id"> <i class="bi bi-printer me-1"></i> Imprimir recibo</a>
-                            }
                         </div>
                     </td>
                 }
