@@ -3,6 +3,10 @@
 
     Layout = "_Layout";
     var currentBalance = Model.Sum(m => m.Amount);
+
+    // Selected year/month for filters and export — read from ViewData or use defaults
+    int selectedYear = ViewData["Year"] is int y ? y : DateTime.Now.Year;
+    int selectedMonth = ViewData["Month"] is int m ? m : DateTime.Now.Month;
 }
 @await Html.PartialAsync("_headerPrint")
 
@@ -22,11 +26,7 @@
 
                 <div class="d-flex align-items-center">
                     <form method="get" asp-controller="Balance" asp-action="Index" class="d-flex align-items-center me-2">
-                        @{ 
-                            int selectedYear = ViewData["Year"] is int y ? y : DateTime.Now.Year;
-                            int selectedMonth = ViewData["Month"] is int m ? m : DateTime.Now.Month;
-                        }
-
+                        
                         <label for="yearInput" class="me-2 mb-0">Año</label>
                         <input id="yearInput" name="year" type="number" class="form-control me-2" value="@selectedYear" min="1900" max="2100" style="width:100px;" required />
 
@@ -45,6 +45,10 @@
 
                         <button type="submit" class="btn btn-primary">Buscar</button>
                     </form>
+
+                    <a asp-controller="Balance" asp-action="Export" asp-route-year="@selectedYear" asp-route-month="@selectedMonth" class="btn btn-success me-2" title="Exportar a XLS">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar XLS
+                    </a>
 
                     <button class="btn btn-outline-secondary" onclick="window.print()" title="Imprimir Balance">
                         <i class="bi bi-printer"></i> Imprimir
