@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Balance>
 @{
-
+    ViewData["Title"] = "Balances ";
     Layout = "_Layout";
     var currentBalance = Model.Sum(m => m.Amount);
 
@@ -19,7 +19,7 @@
                     <h5 class="text-muted">
                         Balance:
                         <span class="@(currentBalance >= 0 ? "text-success" : "text-danger")">
-                            @currentBalance.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))
+                            @currentBalance.Value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))
                         </span>
                     </h5>
                 </div>

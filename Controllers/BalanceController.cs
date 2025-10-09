@@ -8,7 +8,7 @@ public class BalanceController(LoggerService loggerService,
     public async Task<ActionResult> Index(int? year, int? month)
     {
         int resolvedYear = year ?? DateTime.Now.Year;
-        int resolvedMonth = month ?? DateTime.Now.AddMonths(-1).Month;
+        int resolvedMonth = month ?? DateTime.Now.Month;
 
         var balances = new List<Balance>();
         try
@@ -31,7 +31,7 @@ public class BalanceController(LoggerService loggerService,
     public async Task<FileResult> Export(int? year, int? month)
     {
         int resolvedYear = year ?? DateTime.Now.Year;
-        int resolvedMonth = month ?? DateTime.Now.AddMonths(-1).Month;
+        int resolvedMonth = month ?? DateTime.Now.Month;
 
         var balances = new List<Balance>();
         try
@@ -56,8 +56,8 @@ public class BalanceController(LoggerService loggerService,
         {
             var date = item.Date.ToString("dd/MM/yyyy", culture);
             var client = $"{item.Name} {item.Surname}";
-            var debe = item.Amount > 0 ? item.Amount.ToString("C", culture) : string.Empty;
-            var haber = item.Amount <= 0 ? item.Amount.ToString("C", culture) : string.Empty;
+            var debe = item.Amount > 0 ? item.Amount.Value.ToString("C", culture) : string.Empty;
+            var haber = item.Amount <= 0 ? item.Amount.Value.ToString("C", culture) : string.Empty;
 
             sb.AppendLine("<tr>");
             sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(date)}</td>");

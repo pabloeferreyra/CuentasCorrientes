@@ -7,7 +7,7 @@ public class BalanceRepository(LoggerService loggerService, ApplicationDbContext
     public async Task<List<Balance>> GetBalance(int year, int month)
     {
         try
-        {
+            {
             var balances = await _context.Set<Balance>()
             .FromSqlInterpolated($"SELECT * FROM get_movements_with_client({year}, {month})")
             .ToListAsync();
