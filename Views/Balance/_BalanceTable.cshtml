@@ -18,13 +18,13 @@
 				<td>@($"{item.Name} {item.Surname}")</td>
 				@if(item.Amount > 0)
 				{
-					<td>@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+					<td>@item.Amount.Value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
 					<td></td>
 				}
 				else
 				{
 					<td></td>
-					<td style="background-color: #bb2d3b; color:white;">@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+					<td style="background-color: #bb2d3b; color:white;">@item.Amount.Value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
 				}
 			</tr>   
 		}
