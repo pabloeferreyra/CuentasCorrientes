@@ -1,0 +1,13 @@
+bin/
+obj/
+out/
+.vs/
+.git/
+.gitignore
+.env
+.env.*
+Dockerfile.user
+**/*.user
+**/*.suo
+**/*.cache
+**/*.log
