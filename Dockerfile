@@ -10,8 +10,11 @@ RUN dotnet publish "CuentasCorrientes.csproj" -c Release -o /app/publish /p:UseA
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 WORKDIR /app
 
+RUN apk add --no-cache icu-libs
+
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "CuentasCorrientes.dll"]
