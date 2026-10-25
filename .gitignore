@@ -8,6 +8,11 @@
 .env.*
 !.env.example
 
+$RECYCLE.BIN/
+.freebuff
+.vscode/
+.vs/
+
 # User-specific files
 *.rsuser
 *.suo
