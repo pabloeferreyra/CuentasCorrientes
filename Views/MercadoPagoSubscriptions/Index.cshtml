@@ -1,4 +1,4 @@
-@model IReadOnlyList<CuentasCorrientes.Models.ApplicationSubscription>
+@model IReadOnlyList<CuentasCorrientes.Models.ApplicationSubscriptionListItem>
 @{
     ViewData["Title"] = "Suscripción";
     var culture = System.Globalization.CultureInfo.GetCultureInfo("es-AR");
@@ -37,6 +37,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Usuario</th>
                     <th>Fecha</th>
                     <th>Importe mensual</th>
                     <th>Estado</th>
@@ -48,6 +49,7 @@
                 @foreach (var subscription in Model)
                 {
                     <tr>
+                        <td>@subscription.UserName</td>
                         <td>@subscription.CreatedAt.ToLocalTime().ToString("g")</td>
                         <td>@subscription.MonthlyAmount.ToString("N2", culture) @subscription.CurrencyId</td>
                         <td>@subscription.Status</td>

@@ -24,9 +24,29 @@ public class MercadoPagoSubscriptionsController(
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
 
-        var subscriptions = await dbContext.ApplicationSubscriptions
-            .Where(subscription => subscription.UserId == userId)
-            .OrderByDescending(subscription => subscription.CreatedAt)
+        var subscriptionsQuery = dbContext.ApplicationSubscriptions.AsQueryable();
+        if (!User.IsInRole("SuperUser"))
+            subscriptionsQuery = subscriptionsQuery.Where(subscription => subscription.UserId == userId);
+
+        var subscriptions = await (
+            from subscription in subscriptionsQuery
+            join identityUser in dbContext.Users
+                on subscription.UserId equals identityUser.Id into identityUsers
+            from identityUser in identityUsers.DefaultIfEmpty()
+            orderby subscription.CreatedAt descending
+            select new ApplicationSubscriptionListItem
+            {
+                Id = subscription.Id,
+                UserName = identityUser == null
+                    ? "Usuario eliminado"
+                    : identityUser.UserName ?? identityUser.Email ?? "Usuario",
+                MercadoPagoId = subscription.MercadoPagoId,
+                Status = subscription.Status,
+                MonthlyAmount = subscription.MonthlyAmount,
+                CurrencyId = subscription.CurrencyId,
+                CreatedAt = subscription.CreatedAt,
+                UpdatedAt = subscription.UpdatedAt
+            })
             .ToListAsync(cancellationToken);
 
         ViewBag.MonthlyAmount = _options.MonthlyAmount;
