@@ -1,0 +1,68 @@
+@model IReadOnlyList<CuentasCorrientes.Models.ApplicationSubscription>
+@{
+    ViewData["Title"] = "Suscripción";
+}
+
+<h1>Suscripción a Cuentas Corrientes</h1>
+@if (User.IsInRole("Administrador"))
+{
+    <p>Precio: <strong>@(((decimal)ViewBag.MonthlyAmount).ToString("C2")) @ViewBag.CurrencyId por mes</strong></p>
+
+    @if (TempData["SubscriptionError"] is string error)
+    {
+        <div class="alert alert-danger" role="alert">@error</div>
+    }
+    @if (TempData["SubscriptionMessage"] is string message)
+    {
+        <div class="alert alert-info" role="status">@message</div>
+    }
+
+    @if (!Model.Any(subscription => subscription.Status is "pending"))
+    {
+        <form asp-action="Subscribe" method="post">
+            <button class="btn btn-primary" type="submit">Continuar a Mercado Pago</button>
+        </form>
+    }
+    else
+    {
+        <p>Ya hay una suscripción pendiente o autorizada. No se iniciará otro cobro para esta cuenta.</p>
+    }
+}
+@if (User.IsInRole("SuperUser"))
+{
+    @if (Model.Count > 0)
+    {
+        <h2 class="h4 mt-4">Historial</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Importe mensual</th>
+                    <th>Estado</th>
+                    <th>Actualizado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var subscription in Model)
+                {
+                    <tr>
+                        <td>@subscription.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>@subscription.MonthlyAmount.ToString("C2") @subscription.CurrencyId</td>
+                        <td>@subscription.Status</td>
+                        <td>@subscription.UpdatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(subscription.MercadoPagoId))
+                            {
+                                <form asp-action="Refresh" method="post">
+                                    <input type="hidden" name="id" value="@subscription.Id" />
+                                    <button class="btn btn-outline-secondary btn-sm" type="submit">Consultar Mercado Pago</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

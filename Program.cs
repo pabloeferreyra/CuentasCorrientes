@@ -1,6 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddUserSecrets<Program>();
+AddDotEnvFile(builder.Configuration, ResolveDotEnvPath(builder.Environment));
 builder.Configuration.AddEnvironmentVariables();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>(optional: true);
+}
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? builder.Configuration["ConnectionStrings:LocalConnection"]
@@ -31,6 +44,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<MercadoPagoOptions>(builder.Configuration.GetSection("MercadoPago"));
+builder.Services.AddHttpClient<MercadoPagoSubscriptionService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.mercadopago.com/");
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -127,3 +145,64 @@ app.MapRazorPages()
    .WithStaticAssets();
 
     app.Run();
+
+static void AddDotEnvFile(IConfigurationBuilder configurationBuilder, string filePath)
+{
+    if (!File.Exists(filePath))
+    {
+        return;
+    }
+
+    var values = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var rawLine in File.ReadAllLines(filePath))
+    {
+        var line = rawLine.Trim();
+        if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#'))
+        {
+            continue;
+        }
+
+        var separatorIndex = line.IndexOf('=');
+        if (separatorIndex <= 0)
+        {
+            continue;
+        }
+
+        var key = line[..separatorIndex].Trim();
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            continue;
+        }
+
+        values[key.Replace("__", ":")] = line[(separatorIndex + 1)..].Trim();
+    }
+
+    configurationBuilder.AddInMemoryCollection(values);
+}
+
+static string ResolveDotEnvPath(IHostEnvironment environment)
+{
+    var configuredPath = Environment.GetEnvironmentVariable("CUENTASCORRIENTES_DOTENV_PATH");
+    if (!string.IsNullOrWhiteSpace(configuredPath) && File.Exists(configuredPath))
+    {
+        return configuredPath;
+    }
+
+    var candidatePaths = new[]
+    {
+        Path.Combine(environment.ContentRootPath, ".env"),
+        Path.Combine(AppContext.BaseDirectory, ".env"),
+        Path.Combine(Directory.GetCurrentDirectory(), ".env")
+    };
+
+    foreach (var candidatePath in candidatePaths)
+    {
+        if (File.Exists(candidatePath))
+        {
+            return candidatePath;
+        }
+    }
+
+    return candidatePaths[0];
+}

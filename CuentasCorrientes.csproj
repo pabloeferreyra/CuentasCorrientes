@@ -5,9 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-CuentasCorrientes-ffec0598-b49e-4cf4-969e-6371681c81d0</UserSecretsId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="*.cs;Areas\**\*.cs;Controllers\*.cs;Data\*.cs;Helpers\*.cs;Migrations\*.cs;Models\*.cs;Services\**\*.cs" />
     <PackageReference Include="Mapster" Version="10.0.13" />
     <PackageReference Include="Mapster.DependencyInjection" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.14" />

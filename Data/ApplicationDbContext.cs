@@ -10,6 +10,7 @@
         public DbSet<ClientType> ClientTypes { get; set; } = null!;
         public DbSet<CurrentAccounts> CurrentAccounts { get; set; } = null!;
         public DbSet<Movements> Movements { get; set; } = null!;
+        public DbSet<ApplicationSubscription> ApplicationSubscriptions { get; set; } = null!;
     public override int SaveChanges()
         {
             SetAuditFields();
@@ -48,6 +49,18 @@
             .Property(ca => ca.Date)
             .HasColumnType("date");
             modelBuilder.Entity<Movements>().ToTable("Movements");
+            modelBuilder.Entity<ApplicationSubscription>(entity =>
+            {
+                entity.ToTable("ApplicationSubscriptions");
+                entity.HasIndex(subscription => subscription.ExternalReference).IsUnique();
+                entity.HasIndex(subscription => subscription.MercadoPagoId).IsUnique();
+                entity.Property(subscription => subscription.Status).HasMaxLength(32);
+                entity.Property(subscription => subscription.CurrencyId).HasMaxLength(3);
+                entity.Property(subscription => subscription.ExternalReference).HasMaxLength(64);
+                entity.Property(subscription => subscription.MercadoPagoId).HasMaxLength(64);
+                entity.Property(subscription => subscription.UserId).HasMaxLength(450);
+                entity.Property(subscription => subscription.MonthlyAmount).HasPrecision(18, 2);
+            });
             modelBuilder.Entity<Client>()
                 .HasOne(c => c.ClientType)
                 .WithMany(ct => ct.Clients)
