@@ -1,12 +1,13 @@
 @model IReadOnlyList<CuentasCorrientes.Models.ApplicationSubscription>
 @{
     ViewData["Title"] = "Suscripción";
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("es-AR");
 }
 
 <h1>Suscripción a Cuentas Corrientes</h1>
 @if (User.IsInRole("Administrador"))
 {
-    <p>Precio: <strong>@(((decimal)ViewBag.MonthlyAmount).ToString("C2")) @ViewBag.CurrencyId por mes</strong></p>
+    <p>Precio: <strong>@(((decimal)ViewBag.MonthlyAmount).ToString("N2", culture)) @ViewBag.CurrencyId por mes</strong></p>
 
     @if (TempData["SubscriptionError"] is string error)
     {
@@ -48,7 +49,7 @@
                 {
                     <tr>
                         <td>@subscription.CreatedAt.ToLocalTime().ToString("g")</td>
-                        <td>@subscription.MonthlyAmount.ToString("C2") @subscription.CurrencyId</td>
+                        <td>@subscription.MonthlyAmount.ToString("N2", culture) @subscription.CurrencyId</td>
                         <td>@subscription.Status</td>
                         <td>@subscription.UpdatedAt.ToLocalTime().ToString("g")</td>
                         <td>
