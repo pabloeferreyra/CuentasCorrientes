@@ -5,7 +5,7 @@
 }
 
 <h1>Suscripción a Cuentas Corrientes</h1>
-@if (User.IsInRole("Administrador"))
+@if (User.IsInRole("Administrador") || User.IsInRole("SuperUser"))
 {
     <p>Precio: <strong>@(((decimal)ViewBag.MonthlyAmount).ToString("N2", culture)) @ViewBag.CurrencyId por mes</strong></p>
 
@@ -21,6 +21,10 @@
     @if (!Model.Any(subscription => subscription.Status is "pending"))
     {
         <form asp-action="Subscribe" method="post">
+            <div class="mb-3">
+                <label for="payerEmail" class="form-label">Correo asociado a tu cuenta de Mercado Pago</label>
+                <input id="payerEmail" name="payerEmail" type="email" class="form-control" autocomplete="email" required />
+            </div>
             <button class="btn btn-primary" type="submit">Continuar a Mercado Pago</button>
         </form>
     }

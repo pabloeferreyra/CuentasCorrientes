@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -56,20 +57,24 @@ public class MercadoPagoSubscriptionsController(
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Subscribe(CancellationToken cancellationToken)
+    public async Task<IActionResult> Subscribe(string? payerEmail, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
-        var user = await userManager.GetUserAsync(User);
-        if (user is null || string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(user.Email))
+        if (string.IsNullOrWhiteSpace(userId))
         {
-            TempData["SubscriptionError"] = "La cuenta debe tener un correo electrónico para iniciar la suscripción.";
+            return Unauthorized();
+        }
+
+        if (string.IsNullOrWhiteSpace(payerEmail) || !new EmailAddressAttribute().IsValid(payerEmail))
+        {
+            TempData["SubscriptionError"] = "Ingresá un correo válido asociado a tu cuenta de Mercado Pago.";
             return RedirectToAction(nameof(Index));
         }
 
-        var payerEmail = environment.IsDevelopment() &&
+        var mercadoPagoPayerEmail = environment.IsDevelopment() &&
             !string.IsNullOrWhiteSpace(_options.TestPayerEmail)
                 ? _options.TestPayerEmail
-                : user.Email;
+                : payerEmail;
 
         var hasOngoingSubscription = await dbContext.ApplicationSubscriptions.AnyAsync(
             subscription => subscription.UserId == userId &&
@@ -122,7 +127,7 @@ public class MercadoPagoSubscriptionsController(
         try
         {
             var result = await subscriptionService.CreateAsync(
-                payerEmail,
+                mercadoPagoPayerEmail,
                 externalReference,
                 notificationUrl,
                 backUrl,
