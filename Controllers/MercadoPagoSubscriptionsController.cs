@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace CuentasCorrientes.Controllers;
 
-[Authorize]
+[AllowAnonymous]
 public class MercadoPagoSubscriptionsController(
     ApplicationDbContext dbContext,
     UserManager<IdentityUser> userManager,
