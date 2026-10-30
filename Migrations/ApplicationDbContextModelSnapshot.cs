@@ -77,8 +77,8 @@ namespace CuentasCorrientes.Migrations
 
             modelBuilder.Entity("CuentasCorrientes.Models.Balance", b =>
                 {
-                    b.Property<decimal?>("Amount")
-                        .HasColumnType("numeric");
+                    b.Property<double?>("Amount")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Cuit")
                         .HasColumnType("text");

@@ -4,7 +4,7 @@ public class Balance
 {
     public int? Id { get; set; }
     public string? Description { get; set; } = string.Empty;
-    public decimal? Amount { get; set; }
+    public double? Amount { get; set; }
     public DateTime Date { get; set; }
 
     // Datos del cliente
