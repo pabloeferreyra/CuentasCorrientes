@@ -21,7 +21,7 @@
                     <h5 class="text-muted">
                         Saldo: 
                         <span class="@(currentBalance >= 0 ? "text-success" : "text-danger")">
-                            @currentBalance.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))
+                            @CurrencyFormatting.Format(currentBalance)
                         </span>
                     </h5>
                 </div>

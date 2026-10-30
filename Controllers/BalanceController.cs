@@ -1,4 +1,6 @@
-﻿namespace CuentasCorrientes.Controllers;
+﻿using CuentasCorrientes.Helpers;
+
+namespace CuentasCorrientes.Controllers;
 
 [Authorize(Roles = "Administrador")]
 public class BalanceController(LoggerService loggerService,
@@ -56,8 +58,8 @@ public class BalanceController(LoggerService loggerService,
         {
             var date = item.Date.ToString("dd/MM/yyyy", culture);
             var client = $"{item.Name} {item.Surname}";
-            var debe = item.Amount > 0 ? item.Amount.Value.ToString("C", culture) : string.Empty;
-            var haber = item.Amount <= 0 ? item.Amount.Value.ToString("C", culture) : string.Empty;
+            var debe = item.Amount > 0 ? CurrencyFormatting.Format(item.Amount.Value) : string.Empty;
+            var haber = item.Amount <= 0 ? CurrencyFormatting.Format(item.Amount.Value) : string.Empty;
 
             sb.AppendLine("<tr>");
             sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(date)}</td>");

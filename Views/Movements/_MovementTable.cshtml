@@ -24,13 +24,13 @@
                 <td>@movement.Description</td>
                 @if(movement.Amount > 0)
                 {
-                    <td>@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                    <td>@CurrencyFormatting.Format(movement.Amount)</td>
                     <td></td>
                 }
                 else
                 {
                     <td></td>
-                    <td style="background-color: #bb2d3b; color:white;">@movement.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td>
+                    <td style="background-color: #bb2d3b; color:white;">@CurrencyFormatting.Format(movement.Amount)</td>
                 }
                 <td class="no-print">
                     <div class="btn-group no-print" role="group">
