@@ -127,7 +127,6 @@ else
     app.UseHsts();
 }
 
-app.UsePathBase("/CCApp");
 
 app.UseHttpsRedirection();
 app.UseRouting();

@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using CuentasCorrientes.Services;
 using Microsoft.Extensions.Options;
@@ -108,7 +106,7 @@ public class MercadoPagoSubscriptionsController(
         var notificationUrl = Url.Action(
             nameof(Webhook),
             "MercadoPagoSubscriptions",
-            new { secret = _options.WebhookSecret },
+            null,
             Uri.UriSchemeHttps,
             publicUri.Authority);
         var backUrl = Url.Action(
@@ -194,45 +192,94 @@ public class MercadoPagoSubscriptionsController(
         }
     }
 
-    [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> Webhook(
-        [FromQuery] string? secret,
-        [FromBody] JsonElement payload,
-        CancellationToken cancellationToken)
+    [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
+    [RequestSizeLimit(16_384)]
+    public async Task<IActionResult> Webhook(CancellationToken cancellationToken)
     {
-        if (!IsValidWebhookSecret(secret))
-            return Unauthorized();
+        var dataId = Request.Query["data.id"].FirstOrDefault();
+        var notificationType = Request.Query["type"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(notificationType))
+        {
+            notificationType = Request.Query["topic"].FirstOrDefault();
+        }
 
-        var notificationType = GetJsonString(payload, "type") ?? Request.Query["type"].ToString();
-        if (notificationType != "subscription_preapproval")
-            return Ok();
+        if (string.IsNullOrWhiteSpace(notificationType))
+        {
+            try
+            {
+                using var payload = await JsonDocument.ParseAsync(Request.Body, cancellationToken: cancellationToken);
+                if (payload.RootElement.TryGetProperty("type", out var typeValue)
+                    && typeValue.ValueKind == JsonValueKind.String)
+                {
+                    notificationType = typeValue.GetString();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (JsonException)
+            {
+                return BadRequest();
+            }
+        }
 
-        var subscriptionId = GetJsonString(payload, "data", "id") ?? Request.Query["data.id"].ToString();
-        if (string.IsNullOrWhiteSpace(subscriptionId))
-            return BadRequest();
+        if (string.IsNullOrWhiteSpace(_options.WebhookSecret))
+        {
+            logger.LogError("Mercado Pago webhook secret is not configured.");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
 
-        var remoteSubscription = await subscriptionService.GetAsync(subscriptionId, cancellationToken);
-        if (string.IsNullOrWhiteSpace(remoteSubscription.Id) ||
-            string.IsNullOrWhiteSpace(remoteSubscription.ExternalReference) ||
-            string.IsNullOrWhiteSpace(remoteSubscription.Status))
+        if (string.IsNullOrWhiteSpace(dataId))
         {
             return BadRequest();
         }
 
+        if (!MercadoPagoWebhookSignature.IsValid(
+                Request.Headers["x-signature"].FirstOrDefault(),
+                Request.Headers["x-request-id"].FirstOrDefault(),
+                dataId,
+                _options.WebhookSecret))
+        {
+            return Unauthorized();
+        }
+
+        if (!string.Equals(notificationType, "subscription_preapproval", StringComparison.Ordinal))
+        {
+            return Ok();
+        }
+
+        var preapproval = await subscriptionService.GetAsync(dataId, cancellationToken);
+        if (!string.Equals(preapproval.Id, dataId, StringComparison.Ordinal)
+            || string.IsNullOrWhiteSpace(preapproval.ExternalReference))
+        {
+            logger.LogWarning("Mercado Pago webhook returned a mismatched subscription identifier.");
+            return Ok();
+        }
+
         var subscription = await dbContext.ApplicationSubscriptions.SingleOrDefaultAsync(
-            item => item.ExternalReference == remoteSubscription.ExternalReference,
+            record => record.ExternalReference == preapproval.ExternalReference,
             cancellationToken);
         if (subscription is null)
+        {
+            logger.LogWarning("Received a Mercado Pago webhook without a matching local subscription.");
             return Ok();
+        }
 
-        if (subscription.MercadoPagoId is not null && subscription.MercadoPagoId != remoteSubscription.Id)
-            return BadRequest();
+        if (subscription.MercadoPagoId is not null
+            && !string.Equals(subscription.MercadoPagoId, preapproval.Id, StringComparison.Ordinal))
+        {
+            logger.LogError("Mercado Pago webhook identifier did not match the stored subscription.");
+            return Ok();
+        }
 
-        subscription.MercadoPagoId = remoteSubscription.Id;
-        subscription.Status = remoteSubscription.Status;
+        subscription.MercadoPagoId = preapproval.Id;
+        subscription.Status = preapproval.Status;
         subscription.UpdatedAt = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
+
         return Ok();
     }
 
@@ -361,35 +408,4 @@ public class MercadoPagoSubscriptionsController(
         return RedirectToAction(nameof(Index));
     }
 
-    private bool IsValidWebhookSecret(string? secret)
-    {
-        if (string.IsNullOrEmpty(secret) ||
-            string.IsNullOrEmpty(_options.WebhookSecret) ||
-            Encoding.UTF8.GetByteCount(_options.WebhookSecret) < 32)
-            return false;
-
-        var provided = Encoding.UTF8.GetBytes(secret);
-        var expected = Encoding.UTF8.GetBytes(_options.WebhookSecret);
-        return provided.Length == expected.Length &&
-            CryptographicOperations.FixedTimeEquals(provided, expected);
-    }
-
-    private static string? GetJsonString(JsonElement element, params string[] path)
-    {
-        foreach (var property in path)
-        {
-            if (element.ValueKind != JsonValueKind.Object ||
-                !element.TryGetProperty(property, out element))
-            {
-                return null;
-            }
-        }
-
-        return element.ValueKind switch
-        {
-            JsonValueKind.String => element.GetString(),
-            JsonValueKind.Number => element.GetRawText(),
-            _ => null
-        };
-    }
 }
