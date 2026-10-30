@@ -348,9 +348,11 @@ public class MercadoPagoSubscriptionsController(
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
 
+        var isSuperUser = User.IsInRole("SuperUser");
         var subscription = await dbContext.ApplicationSubscriptions.SingleOrDefaultAsync(
             item => item.Id == id &&
-                (item.UserId == userId ||
+                (isSuperUser ||
+                 item.UserId == userId ||
                  (environment.IsDevelopment() && item.UserId == Guid.Empty.ToString())),
             cancellationToken);
         if (subscription is null)
